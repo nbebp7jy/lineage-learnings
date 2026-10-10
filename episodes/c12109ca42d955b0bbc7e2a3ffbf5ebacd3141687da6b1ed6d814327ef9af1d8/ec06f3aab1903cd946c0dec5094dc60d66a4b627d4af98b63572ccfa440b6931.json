@@ -1,0 +1,898 @@
+{
+  "schema": "lineage-episode/1",
+  "episode_id": "ec06f3aab1903cd946c0dec5094dc60d66a4b627d4af98b63572ccfa440b6931",
+  "seq": 2811,
+  "network": "devnet",
+  "session_id": "025cc97dfebfc9f2bc5267172934e63d0fc7e6ee332a99e8433bc4aa29207412",
+  "agent": {
+    "id": "FCYKkFRMhHHiEphVWk3wxYkBSuHnALMfYrzRnCvaK3Nm",
+    "name": "Neap",
+    "hidden": false,
+    "hosted": true,
+    "identity_mode": "purchased",
+    "soul": {
+      "digest": "b4ae3c8e8a4afad6b97c89f607718fc50f7241718e29ac25c301f5ca4add0015",
+      "seq": 1,
+      "stored_at": 1791672010459,
+      "declared_model": {
+        "provider": "anthropic",
+        "id": "claude-opus-5-5"
+      }
+    }
+  },
+  "model": {
+    "provider": "anthropic",
+    "models": [
+      "claude-opus-5-5"
+    ],
+    "route": {
+      "model": {
+        "id": "claude-opus-5-5",
+        "provider": "anthropic"
+      },
+      "upstream": [],
+      "via": "direct"
+    },
+    "harness": {
+      "name": "anthropic",
+      "version": "anthropic/1",
+      "digest": "397a4a3b083a1923ef12e2d35acf8f4dd01c59298cdccab593c73cf528d72aa6"
+    },
+    "source": "provenance:hosted"
+  },
+  "task": {
+    "recipe": {
+      "recipe_id": "d8d4daba3946c56307132a81812f18ecaf374566247e49903b99c89ceca3a41f",
+      "name": "base58-py",
+      "class": "python",
+      "repo": "https://github.com/keis/base58",
+      "commit": "2fae7065e3446e69e5d748c767011f05eee8400e"
+    },
+    "lineage_id": "c12109ca42d955b0bbc7e2a3ffbf5ebacd3141687da6b1ed6d814327ef9af1d8",
+    "parent_gen_id": "afd21ce4b535e4421872014b1a783cfccf70e4a9dabdf9e404bd0c66d08b2fd9",
+    "parent_height": 14,
+    "metrics": [
+      {
+        "name": "encode_ir",
+        "kind": "perf",
+        "direction": "lower",
+        "deterministic": true,
+        "min_effect": 0.01
+      },
+      {
+        "name": "decode_ir",
+        "kind": "perf",
+        "direction": "lower",
+        "deterministic": true,
+        "min_effect": 0.01
+      },
+      {
+        "name": "check_ir",
+        "kind": "perf",
+        "direction": "lower",
+        "deterministic": true,
+        "min_effect": 0.01
+      }
+    ],
+    "target": {
+      "kind": "perf",
+      "target": "encode_ir",
+      "source": "candidate"
+    },
+    "baseline": {
+      "check_ir": {
+        "median": 189886852,
+        "samples": [
+          189886852,
+          189886852
+        ]
+      },
+      "decode_ir": {
+        "median": 288903063,
+        "samples": [
+          288903063,
+          288903063
+        ]
+      },
+      "encode_ir": {
+        "median": 251300331,
+        "samples": [
+          251300331,
+          251300331
+        ]
+      }
+    }
+  },
+  "plan": {
+    "planned": null,
+    "opening_note": "My notes say to read the hot path and count big-int operations before editing, keep the diff to one function, and keep outputs byte-identical. They also say to stop after three honest attempts that don't move the number, and not to force a change through.",
+    "source": "worker_report + session notes"
+  },
+  "hypotheses": [
+    "My notes say to read the hot path and count big-int operations before editing, keep the diff to one function, and keep outputs byte-identical. They also say to stop after three honest attempts that don't move the number, and not to force a change through.",
+    "Building `singles` on every call would cost more than the change saves, so I'll move it into a cached helper.",
+    "Tidy up the comment, then evaluate."
+  ],
+  "actions": [
+    {
+      "seq": 1,
+      "kind": "note",
+      "at": 1791673968709,
+      "text": "My notes say to read the hot path and count big-int operations before editing, keep the diff to one function, and keep outputs byte-identical. They also say to stop after three honest attempts that don't move the number, and not to force a change through."
+    },
+    {
+      "seq": 2,
+      "kind": "list",
+      "path": "base58",
+      "count": 3,
+      "at": 1791673968715
+    },
+    {
+      "seq": 3,
+      "kind": "read",
+      "path": "base58/__init__.py",
+      "start_line": 1,
+      "end_line": 279,
+      "content_sha256": "80bf078047002a6fe12cd8896ba8c16114d777a8b5bec42ce3dd2abc5c97871d",
+      "at": 1791673968723
+    },
+    {
+      "seq": 4,
+      "kind": "read",
+      "path": "lineage_bench.py",
+      "start_line": 1,
+      "end_line": 92,
+      "content_sha256": "20f5a5ee5d9225f306b0e2527bf5ea25538c5f1342495b62b171205c9ea8d117",
+      "at": 1791673970783
+    },
+    {
+      "seq": 5,
+      "kind": "edit",
+      "path": "base58/__init__.py",
+      "start_line": 108,
+      "end_line": 119,
+      "lines_before": 12,
+      "lines_after": 17,
+      "at": 1791674026396,
+      "diff": "--- a/base58/__init__.py\n+++ b/base58/__init__.py\n@@ -108,12 +108,17 @@\n-    base = len(alphabet)\n-    sq = base * base\n-    big = sq * sq\n-    pairs = _get_base58_encode_pairs.cache.get((alphabet,))\n-    if pairs is None:\n-        pairs = _get_base58_encode_pairs(alphabet)\n-    parts = []\n-    while i:\n-        i, rem = divmod(i, big)\n-        # rem is a small int: two operators are cheaper than a divmod call\n-        parts += pairs[rem % sq], pairs[rem // sq]\n-    parts.reverse()\n+    # except that five digits are peeled off per big-integer division:\n+    # 58**5 still fits in one internal int digit. Each group of five is\n+    # emitted as one single digit and two digit pairs.\n+    base = len(alphabet)\n+    cube = base * base * base\n+    big = cube * base * base\n+    pairs = _get_base58_encode_pairs.cache.get((alphabet,))\n+    if pairs is None:\n+        pairs = _get_base58_encode_pairs(alphabet)\n+    singles = [alphabet[k:k + 1] for k in range(base)]\n+    parts = []\n+    while i:\n+        i, rem = divmod(i, big)\n+        # rem is a small int: plain operators are cheaper than divmod calls\n+        low = rem % cube\n+        parts += singles[low % base], pairs[low // base], pairs[rem // cube]\n+    parts.reverse()"
+    },
+    {
+      "seq": 6,
+      "kind": "note",
+      "at": 1791674036255,
+      "text": "Building `singles` on every call would cost more than the change saves, so I'll move it into a cached helper."
+    },
+    {
+      "seq": 7,
+      "kind": "edit",
+      "path": "base58/__init__.py",
+      "start_line": 117,
+      "end_line": 118,
+      "lines_before": 2,
+      "lines_after": 4,
+      "at": 1791674036257,
+      "diff": "--- a/base58/__init__.py\n+++ b/base58/__init__.py\n@@ -117,2 +117,4 @@\n-    singles = [alphabet[k:k + 1] for k in range(base)]\n-    parts = []\n+    singles = _get_base58_encode_singles.cache.get((alphabet,))\n+    if singles is None:\n+        singles = _get_base58_encode_singles(alphabet)\n+    parts = []"
+    },
+    {
+      "seq": 8,
+      "kind": "edit",
+      "path": "base58/__init__.py",
+      "start_line": 62,
+      "end_line": 63,
+      "lines_before": 2,
+      "lines_after": 8,
+      "at": 1791674036260,
+      "diff": "--- a/base58/__init__.py\n+++ b/base58/__init__.py\n@@ -62,2 +62,8 @@\n-    return list(map(bytes, product(alphabet, repeat=2)))\n-\n+    return list(map(bytes, product(alphabet, repeat=2)))\n+\n+\n+@_cached\n+def _get_base58_encode_singles(alphabet: bytes) -> List[bytes]:\n+    # singles[d] is the one character encoding of digit d\n+    return [alphabet[k:k + 1] for k in range(len(alphabet))]\n+"
+    },
+    {
+      "seq": 9,
+      "kind": "read",
+      "path": "base58/__init__.py",
+      "start_line": 97,
+      "end_line": 135,
+      "content_sha256": "f8b05bb8d789a1bcff5d97e3979c258b1c594dfa91e43884752845b4609a5a51",
+      "at": 1791674038846
+    },
+    {
+      "seq": 10,
+      "kind": "note",
+      "at": 1791674042815,
+      "text": "Tidy up the comment, then evaluate."
+    },
+    {
+      "seq": 11,
+      "kind": "edit",
+      "path": "base58/__init__.py",
+      "start_line": 112,
+      "end_line": 116,
+      "lines_before": 5,
+      "lines_after": 4,
+      "at": 1791674042815,
+      "diff": "--- a/base58/__init__.py\n+++ b/base58/__init__.py\n@@ -112,5 +112,4 @@\n-    # Same digit loop as b58encode_int with default_one=False, inlined to\n-    # save a call per encode\n-    # except that five digits are peeled off per big-integer division:\n-    # 58**5 still fits in one internal int digit. Each group of five is\n-    # emitted as one single digit and two digit pairs.\n+    # Same digit loop as b58encode_int with default_one=False, inlined to\n+    # save a call per encode, except that five digits are peeled off per\n+    # big-integer division: 58**5 still fits in one internal int digit.\n+    # Each group of five is emitted as one single digit and two pairs."
+    },
+    {
+      "seq": 12,
+      "kind": "evaluate",
+      "target": "encode_ir",
+      "eval_kind": "perf",
+      "at": 1791674042845,
+      "phases": [
+        {
+          "phase": "prepare",
+          "at": 1791674042845
+        },
+        {
+          "phase": "build",
+          "at": 1791674045275
+        },
+        {
+          "phase": "build",
+          "at": 1791674045280
+        },
+        {
+          "phase": "test",
+          "at": 1791674048057
+        },
+        {
+          "phase": "test",
+          "at": 1791674053507
+        },
+        {
+          "phase": "equivalence",
+          "at": 1791674057887
+        },
+        {
+          "phase": "equivalence",
+          "at": 1791674057894
+        },
+        {
+          "phase": "metrics",
+          "at": 1791674061017
+        },
+        {
+          "phase": "metrics",
+          "at": 1791674076707
+        },
+        {
+          "phase": "metrics",
+          "at": 1791674091593
+        },
+        {
+          "phase": "metrics",
+          "at": 1791674107634
+        },
+        {
+          "phase": "metrics",
+          "at": 1791674124831
+        },
+        {
+          "phase": "metrics",
+          "at": 1791674136892
+        }
+      ]
+    },
+    {
+      "seq": 26,
+      "kind": "result",
+      "at": 1791674153763,
+      "output": "outcome: rejected (no_improvement: worst ratio 1.0328 vs required 0.9900)\nguard: ok, 1 files, 22 lines\nbuild: base ok, candidate ok\nequivalence: identical outputs\nmetric encode_ir: parent 243833470, candidate 251819448, ratio 1.0328\nmetric decode_ir: parent 282860834, candidate 287129465, ratio 1.0151\nmetric check_ir: parent 191952420, candidate 194830244, ratio 1.0150",
+      "outcome": "rejected",
+      "steps": [
+        {
+          "step": "build",
+          "side": "base",
+          "exit": 0,
+          "duration_ms": 2671,
+          "timed_out": false,
+          "tail": "2.1.1 3.12.15\n"
+        },
+        {
+          "step": "build",
+          "side": "cand",
+          "exit": 0,
+          "duration_ms": 2740,
+          "timed_out": false,
+          "tail": "2.1.1 3.12.15\n"
+        },
+        {
+          "step": "test",
+          "side": "base",
+          "exit": 0,
+          "duration_ms": 5307,
+          "timed_out": false,
+          "tail": "................................................                         [100%]\n---------------------- generated xml file: /out/junit.xml ----------------------\n48 passed in 1.02s\n"
+        },
+        {
+          "step": "test",
+          "side": "cand",
+          "exit": 0,
+          "duration_ms": 4321,
+          "timed_out": false,
+          "tail": "................................................                         [100%]\n---------------------- generated xml file: /out/junit.xml ----------------------\n48 passed in 0.56s\n"
+        },
+        {
+          "step": "equivalence",
+          "side": "base",
+          "exit": 0,
+          "duration_ms": 2993,
+          "timed_out": false,
+          "tail": "ksum'\ndchk-fix 75 ok bytes b'\\x8d\\xec\\xcb\\xee\\xa0\\xea-I\\xdc^]\\x1a\\xea\\x11\\xf0a\\xba\\xd0^\\xef\\xa6\\xcar\\x81a\\x1b|\\x861\\xf3'\ndchk 76 ok bytes b'g\\x81:\\x8e\\r\\x8a)'\ndchk-bad 76 err ValueError 'Invalid checksum'\ndchk-fix 76 ok bytes b'g\\x81:\\x8e\\r\\x8a)'\ndchk 77 ok bytes b'\\x1a\\x9cE?\\x1c;N8\\xd5\\xfe\\xc4\\x87\\x94\\xfb3|\\xcb{\\xd2\\x8cc\\xb7F\\xbfA#\\x1f\\xd6\\x93\\x04\\x8d\\x9d\\x13t\\x11E@\\x96\\x95'\ndchk-bad 77 err ValueError 'Invalid checksum'\ndchk-fix 77 ok bytes b'\\x1a\\x9cE?\\x1c;N8\\xd5\\xfe\\xc4\\x87\\x94\\xfb3|\\xcb{\\xd2\\x8cc\\xb7F\\xbfA#\\x1f\\xd6\\x93\\x04\\x8d\\x9d\\x13t\\x11E@\\x96\\x95'\ndchk 78 ok bytes b\"\\x94\\x19_\\x86IkH\\x0e'YmR\\x80v\\x14!\\xfd\\xe0\"\ndchk-bad 78 err ValueError 'Invalid checksum'\ndchk-fix 78 ok bytes b\"\\x94\\x19_\\x86IkH\\x0e'YmR\\x80v\\x14!\\xfd\\xe0\"\ndchk 79 ok bytes b'\\x06w\\x83\\xde\\x82EW\\x0e\\xc6\\x83{\\x87\\xd1\\x18\\x94?>\\x0b\\xd0\\xd7\\xc8\\xc8\\xa5\\xca\\xf4g\\xab\\xceC\\x0b:/\\x1e\\xa2_$\\xc0\\x13'\ndchk-bad 79 err ValueError 'Invalid checksum'\ndchk-fix 79 ok bytes b'\\x06w\\x83\\xde\\x82EW\\x0e\\xc6\\x83{\\x87\\xd1\\x18\\x94?>\\x0b\\xd0\\xd7\\xc8\\xc8\\xa5\\xca\\xf4g\\xab\\xceC\\x0b:/\\x1e\\xa2_$\\xc0\\x13'\ndchk-short err ValueError 'Invalid checksum'\ndchk-empty err ValueError 'Invalid checksum'\nfix-na ok bytes b'hello world'\naliases True True\n"
+        },
+        {
+          "step": "equivalence",
+          "side": "cand",
+          "exit": 0,
+          "duration_ms": 3100,
+          "timed_out": false,
+          "tail": "ksum'\ndchk-fix 75 ok bytes b'\\x8d\\xec\\xcb\\xee\\xa0\\xea-I\\xdc^]\\x1a\\xea\\x11\\xf0a\\xba\\xd0^\\xef\\xa6\\xcar\\x81a\\x1b|\\x861\\xf3'\ndchk 76 ok bytes b'g\\x81:\\x8e\\r\\x8a)'\ndchk-bad 76 err ValueError 'Invalid checksum'\ndchk-fix 76 ok bytes b'g\\x81:\\x8e\\r\\x8a)'\ndchk 77 ok bytes b'\\x1a\\x9cE?\\x1c;N8\\xd5\\xfe\\xc4\\x87\\x94\\xfb3|\\xcb{\\xd2\\x8cc\\xb7F\\xbfA#\\x1f\\xd6\\x93\\x04\\x8d\\x9d\\x13t\\x11E@\\x96\\x95'\ndchk-bad 77 err ValueError 'Invalid checksum'\ndchk-fix 77 ok bytes b'\\x1a\\x9cE?\\x1c;N8\\xd5\\xfe\\xc4\\x87\\x94\\xfb3|\\xcb{\\xd2\\x8cc\\xb7F\\xbfA#\\x1f\\xd6\\x93\\x04\\x8d\\x9d\\x13t\\x11E@\\x96\\x95'\ndchk 78 ok bytes b\"\\x94\\x19_\\x86IkH\\x0e'YmR\\x80v\\x14!\\xfd\\xe0\"\ndchk-bad 78 err ValueError 'Invalid checksum'\ndchk-fix 78 ok bytes b\"\\x94\\x19_\\x86IkH\\x0e'YmR\\x80v\\x14!\\xfd\\xe0\"\ndchk 79 ok bytes b'\\x06w\\x83\\xde\\x82EW\\x0e\\xc6\\x83{\\x87\\xd1\\x18\\x94?>\\x0b\\xd0\\xd7\\xc8\\xc8\\xa5\\xca\\xf4g\\xab\\xceC\\x0b:/\\x1e\\xa2_$\\xc0\\x13'\ndchk-bad 79 err ValueError 'Invalid checksum'\ndchk-fix 79 ok bytes b'\\x06w\\x83\\xde\\x82EW\\x0e\\xc6\\x83{\\x87\\xd1\\x18\\x94?>\\x0b\\xd0\\xd7\\xc8\\xc8\\xa5\\xca\\xf4g\\xab\\xceC\\x0b:/\\x1e\\xa2_$\\xc0\\x13'\ndchk-short err ValueError 'Invalid checksum'\ndchk-empty err ValueError 'Invalid checksum'\nfix-na ok bytes b'hello world'\naliases True True\n"
+        },
+        {
+          "step": "metrics",
+          "side": "base",
+          "exit": 0,
+          "duration_ms": 15689,
+          "timed_out": false,
+          "tail": "==6== Cachegrind, a cache and branch-prediction profiler\n==6== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==6== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==6== Command: python lineage_bench.py encode 1d783d00ed2a03b3\n==6== \n==6== \n==6== I   refs:      243,833,470\n"
+        },
+        {
+          "step": "metrics",
+          "side": "cand",
+          "exit": 0,
+          "duration_ms": 14881,
+          "timed_out": false,
+          "tail": "==7== Cachegrind, a cache and branch-prediction profiler\n==7== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==7== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==7== Command: python lineage_bench.py encode 1d783d00ed2a03b3\n==7== \n==7== \n==7== I   refs:      251,819,448\n"
+        },
+        {
+          "step": "metrics",
+          "side": "base",
+          "exit": 0,
+          "duration_ms": 16038,
+          "timed_out": false,
+          "tail": "==7== Cachegrind, a cache and branch-prediction profiler\n==7== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==7== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==7== Command: python lineage_bench.py decode 1d783d00ed2a03b3\n==7== \n==7== \n==7== I   refs:      282,860,834\n"
+        },
+        {
+          "step": "metrics",
+          "side": "cand",
+          "exit": 0,
+          "duration_ms": 17195,
+          "timed_out": false,
+          "tail": "==7== Cachegrind, a cache and branch-prediction profiler\n==7== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==7== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==7== Command: python lineage_bench.py decode 1d783d00ed2a03b3\n==7== \n==7== \n==7== I   refs:      287,129,465\n"
+        },
+        {
+          "step": "metrics",
+          "side": "base",
+          "exit": 0,
+          "duration_ms": 12054,
+          "timed_out": false,
+          "tail": "==6== Cachegrind, a cache and branch-prediction profiler\n==6== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==6== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==6== Command: python lineage_bench.py check 1d783d00ed2a03b3\n==6== \n==6== \n==6== I   refs:      191,952,420\n"
+        },
+        {
+          "step": "metrics",
+          "side": "cand",
+          "exit": 0,
+          "duration_ms": 16833,
+          "timed_out": false,
+          "tail": "==7== Cachegrind, a cache and branch-prediction profiler\n==7== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==7== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==7== Command: python lineage_bench.py check 1d783d00ed2a03b3\n==7== \n==7== \n==7== I   refs:      194,830,244\n"
+        }
+      ]
+    },
+    {
+      "seq": 27,
+      "kind": "edit",
+      "path": "base58/__init__.py",
+      "start_line": 112,
+      "end_line": 133,
+      "lines_before": 22,
+      "lines_after": 13,
+      "at": 1791674200624,
+      "diff": "--- a/base58/__init__.py\n+++ b/base58/__init__.py\n@@ -112,22 +112,13 @@\n-    # Same digit loop as b58encode_int with default_one=False, inlined to\n-    # save a call per encode, except that five digits are peeled off per\n-    # big-integer division: 58**5 still fits in one internal int digit.\n-    # Each group of five is emitted as one single digit and two pairs.\n-    base = len(alphabet)\n-    cube = base * base * base\n-    big = cube * base * base\n-    pairs = _get_base58_encode_pairs.cache.get((alphabet,))\n-    if pairs is None:\n-        pairs = _get_base58_encode_pairs(alphabet)\n-    singles = _get_base58_encode_singles.cache.get((alphabet,))\n-    if singles is None:\n-        singles = _get_base58_encode_singles(alphabet)\n-    parts = []\n-    while i:\n-        i, rem = divmod(i, big)\n-        # rem is a small int: plain operators are cheaper than divmod calls\n-        low = rem % cube\n-        parts += singles[low % base], pairs[low // base], pairs[rem // cube]\n-    parts.reverse()\n-    zero = alphabet[0:1]\n-    return\n+    # Same digit loop as b58encode_int with default_one=False, inlined to\n+    # save a call per encode\n+    tables = _get_base58_encode_tables.cache.get((alphabet,))\n+    if tables is None:\n+        tables = _get_base58_encode_tables(alphabet)\n+    pairs, sq, big, zero = tables\n+    parts = []\n+    while i:\n+        i, rem = divmod(i, big)\n+        # rem is a small int: two operators are cheaper than a divmod call\n+        parts += pairs[rem % sq], pairs[rem // sq]\n+    parts.reverse()\n+    return"
+    },
+    {
+      "seq": 28,
+      "kind": "edit",
+      "path": "base58/__init__.py",
+      "start_line": 65,
+      "end_line": 68,
+      "lines_before": 4,
+      "lines_after": 8,
+      "at": 1791674200629,
+      "diff": "--- a/base58/__init__.py\n+++ b/base58/__init__.py\n@@ -65,4 +65,8 @@\n-@_cached\n-def _get_base58_encode_singles(alphabet: bytes) -> List[bytes]:\n-    # singles[d] is the one character encoding of digit d\n-    return [alphabet[k:k + 1] for k in range(len(alphabet))]\n+@_cached\n+def _get_base58_encode_tables(\n+    alphabet: bytes\n+) -> Tuple[List[bytes], int, int, bytes]:\n+    # Everything b58encode needs per alphabet: the digit pair table, the\n+    # pair base (base**2), the divisor (base**4) and the zero character\n+    sq = len(alphabet) ** 2\n+    return _get_base58_encode_pairs(alphabet), sq, sq * sq, alphabet[0:1]"
+    },
+    {
+      "seq": 29,
+      "kind": "evaluate",
+      "target": "encode_ir",
+      "eval_kind": "perf",
+      "at": 1791674200659,
+      "phases": [
+        {
+          "phase": "prepare",
+          "at": 1791674200659
+        },
+        {
+          "phase": "build",
+          "at": 1791674202231
+        },
+        {
+          "phase": "build",
+          "at": 1791674202234
+        },
+        {
+          "phase": "test",
+          "at": 1791674204867
+        },
+        {
+          "phase": "test",
+          "at": 1791674208187
+        },
+        {
+          "phase": "equivalence",
+          "at": 1791674212058
+        },
+        {
+          "phase": "equivalence",
+          "at": 1791674212064
+        },
+        {
+          "phase": "metrics",
+          "at": 1791674215728
+        },
+        {
+          "phase": "metrics",
+          "at": 1791674232787
+        },
+        {
+          "phase": "metrics",
+          "at": 1791674245560
+        },
+        {
+          "phase": "metrics",
+          "at": 1791674260732
+        },
+        {
+          "phase": "metrics",
+          "at": 1791674277435
+        },
+        {
+          "phase": "metrics",
+          "at": 1791674292562
+        }
+      ]
+    },
+    {
+      "seq": 43,
+      "kind": "result",
+      "at": 1791674306924,
+      "output": "outcome: accepted\nguard: ok, 1 files, 21 lines\nbuild: base ok, candidate ok\nequivalence: identical outputs\nmetric encode_ir: parent 243833464, candidate 240816164, ratio 0.9876\nmetric decode_ir: parent 282860840, candidate 281398370, ratio 0.9948\nmetric check_ir: parent 191952420, candidate 190977789, ratio 0.9949",
+      "outcome": "accepted",
+      "steps": [
+        {
+          "step": "build",
+          "side": "base",
+          "exit": 0,
+          "duration_ms": 2280,
+          "timed_out": false,
+          "tail": "2.1.1 3.12.15\n"
+        },
+        {
+          "step": "build",
+          "side": "cand",
+          "exit": 0,
+          "duration_ms": 2598,
+          "timed_out": false,
+          "tail": "2.1.1 3.12.15\n"
+        },
+        {
+          "step": "test",
+          "side": "base",
+          "exit": 0,
+          "duration_ms": 3262,
+          "timed_out": false,
+          "tail": "................................................                         [100%]\n---------------------- generated xml file: /out/junit.xml ----------------------\n48 passed in 0.48s\n"
+        },
+        {
+          "step": "test",
+          "side": "cand",
+          "exit": 0,
+          "duration_ms": 3854,
+          "timed_out": false,
+          "tail": "................................................                         [100%]\n---------------------- generated xml file: /out/junit.xml ----------------------\n48 passed in 0.61s\n"
+        },
+        {
+          "step": "equivalence",
+          "side": "base",
+          "exit": 0,
+          "duration_ms": 2761,
+          "timed_out": false,
+          "tail": "ksum'\ndchk-fix 75 ok bytes b'\\x8d\\xec\\xcb\\xee\\xa0\\xea-I\\xdc^]\\x1a\\xea\\x11\\xf0a\\xba\\xd0^\\xef\\xa6\\xcar\\x81a\\x1b|\\x861\\xf3'\ndchk 76 ok bytes b'g\\x81:\\x8e\\r\\x8a)'\ndchk-bad 76 err ValueError 'Invalid checksum'\ndchk-fix 76 ok bytes b'g\\x81:\\x8e\\r\\x8a)'\ndchk 77 ok bytes b'\\x1a\\x9cE?\\x1c;N8\\xd5\\xfe\\xc4\\x87\\x94\\xfb3|\\xcb{\\xd2\\x8cc\\xb7F\\xbfA#\\x1f\\xd6\\x93\\x04\\x8d\\x9d\\x13t\\x11E@\\x96\\x95'\ndchk-bad 77 err ValueError 'Invalid checksum'\ndchk-fix 77 ok bytes b'\\x1a\\x9cE?\\x1c;N8\\xd5\\xfe\\xc4\\x87\\x94\\xfb3|\\xcb{\\xd2\\x8cc\\xb7F\\xbfA#\\x1f\\xd6\\x93\\x04\\x8d\\x9d\\x13t\\x11E@\\x96\\x95'\ndchk 78 ok bytes b\"\\x94\\x19_\\x86IkH\\x0e'YmR\\x80v\\x14!\\xfd\\xe0\"\ndchk-bad 78 err ValueError 'Invalid checksum'\ndchk-fix 78 ok bytes b\"\\x94\\x19_\\x86IkH\\x0e'YmR\\x80v\\x14!\\xfd\\xe0\"\ndchk 79 ok bytes b'\\x06w\\x83\\xde\\x82EW\\x0e\\xc6\\x83{\\x87\\xd1\\x18\\x94?>\\x0b\\xd0\\xd7\\xc8\\xc8\\xa5\\xca\\xf4g\\xab\\xceC\\x0b:/\\x1e\\xa2_$\\xc0\\x13'\ndchk-bad 79 err ValueError 'Invalid checksum'\ndchk-fix 79 ok bytes b'\\x06w\\x83\\xde\\x82EW\\x0e\\xc6\\x83{\\x87\\xd1\\x18\\x94?>\\x0b\\xd0\\xd7\\xc8\\xc8\\xa5\\xca\\xf4g\\xab\\xceC\\x0b:/\\x1e\\xa2_$\\xc0\\x13'\ndchk-short err ValueError 'Invalid checksum'\ndchk-empty err ValueError 'Invalid checksum'\nfix-na ok bytes b'hello world'\naliases True True\n"
+        },
+        {
+          "step": "equivalence",
+          "side": "cand",
+          "exit": 0,
+          "duration_ms": 3598,
+          "timed_out": false,
+          "tail": "ksum'\ndchk-fix 75 ok bytes b'\\x8d\\xec\\xcb\\xee\\xa0\\xea-I\\xdc^]\\x1a\\xea\\x11\\xf0a\\xba\\xd0^\\xef\\xa6\\xcar\\x81a\\x1b|\\x861\\xf3'\ndchk 76 ok bytes b'g\\x81:\\x8e\\r\\x8a)'\ndchk-bad 76 err ValueError 'Invalid checksum'\ndchk-fix 76 ok bytes b'g\\x81:\\x8e\\r\\x8a)'\ndchk 77 ok bytes b'\\x1a\\x9cE?\\x1c;N8\\xd5\\xfe\\xc4\\x87\\x94\\xfb3|\\xcb{\\xd2\\x8cc\\xb7F\\xbfA#\\x1f\\xd6\\x93\\x04\\x8d\\x9d\\x13t\\x11E@\\x96\\x95'\ndchk-bad 77 err ValueError 'Invalid checksum'\ndchk-fix 77 ok bytes b'\\x1a\\x9cE?\\x1c;N8\\xd5\\xfe\\xc4\\x87\\x94\\xfb3|\\xcb{\\xd2\\x8cc\\xb7F\\xbfA#\\x1f\\xd6\\x93\\x04\\x8d\\x9d\\x13t\\x11E@\\x96\\x95'\ndchk 78 ok bytes b\"\\x94\\x19_\\x86IkH\\x0e'YmR\\x80v\\x14!\\xfd\\xe0\"\ndchk-bad 78 err ValueError 'Invalid checksum'\ndchk-fix 78 ok bytes b\"\\x94\\x19_\\x86IkH\\x0e'YmR\\x80v\\x14!\\xfd\\xe0\"\ndchk 79 ok bytes b'\\x06w\\x83\\xde\\x82EW\\x0e\\xc6\\x83{\\x87\\xd1\\x18\\x94?>\\x0b\\xd0\\xd7\\xc8\\xc8\\xa5\\xca\\xf4g\\xab\\xceC\\x0b:/\\x1e\\xa2_$\\xc0\\x13'\ndchk-bad 79 err ValueError 'Invalid checksum'\ndchk-fix 79 ok bytes b'\\x06w\\x83\\xde\\x82EW\\x0e\\xc6\\x83{\\x87\\xd1\\x18\\x94?>\\x0b\\xd0\\xd7\\xc8\\xc8\\xa5\\xca\\xf4g\\xab\\xceC\\x0b:/\\x1e\\xa2_$\\xc0\\x13'\ndchk-short err ValueError 'Invalid checksum'\ndchk-empty err ValueError 'Invalid checksum'\nfix-na ok bytes b'hello world'\naliases True True\n"
+        },
+        {
+          "step": "metrics",
+          "side": "base",
+          "exit": 0,
+          "duration_ms": 17059,
+          "timed_out": false,
+          "tail": "==7== Cachegrind, a cache and branch-prediction profiler\n==7== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==7== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==7== Command: python lineage_bench.py encode 1d783d00ed2a03b3\n==7== \n==7== \n==7== I   refs:      243,833,464\n"
+        },
+        {
+          "step": "metrics",
+          "side": "cand",
+          "exit": 0,
+          "duration_ms": 12765,
+          "timed_out": false,
+          "tail": "==7== Cachegrind, a cache and branch-prediction profiler\n==7== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==7== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==7== Command: python lineage_bench.py encode 1d783d00ed2a03b3\n==7== \n==7== \n==7== I   refs:      240,816,164\n"
+        },
+        {
+          "step": "metrics",
+          "side": "base",
+          "exit": 0,
+          "duration_ms": 15166,
+          "timed_out": false,
+          "tail": "==7== Cachegrind, a cache and branch-prediction profiler\n==7== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==7== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==7== Command: python lineage_bench.py decode 1d783d00ed2a03b3\n==7== \n==7== \n==7== I   refs:      282,860,840\n"
+        },
+        {
+          "step": "metrics",
+          "side": "cand",
+          "exit": 0,
+          "duration_ms": 16699,
+          "timed_out": false,
+          "tail": "==6== Cachegrind, a cache and branch-prediction profiler\n==6== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==6== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==6== Command: python lineage_bench.py decode 1d783d00ed2a03b3\n==6== \n==6== \n==6== I   refs:      281,398,370\n"
+        },
+        {
+          "step": "metrics",
+          "side": "base",
+          "exit": 0,
+          "duration_ms": 15118,
+          "timed_out": false,
+          "tail": "==9== Cachegrind, a cache and branch-prediction profiler\n==9== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==9== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==9== Command: python lineage_bench.py check 1d783d00ed2a03b3\n==9== \n==9== \n==9== I   refs:      191,952,420\n"
+        },
+        {
+          "step": "metrics",
+          "side": "cand",
+          "exit": 0,
+          "duration_ms": 14256,
+          "timed_out": false,
+          "tail": "==6== Cachegrind, a cache and branch-prediction profiler\n==6== Copyright (C) 2002-2017, and GNU GPL'd, by Nicholas Nethercote et al.\n==6== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info\n==6== Command: python lineage_bench.py check 1d783d00ed2a03b3\n==6== \n==6== \n==6== I   refs:      190,977,789\n"
+        }
+      ]
+    },
+    {
+      "seq": 44,
+      "kind": "submit",
+      "at": 1791674313731,
+      "reason": "b58encode recomputed per-alphabet constants on every call (len(alphabet), base**2, base**4, alphabet[0:1]) next to a cached pair-table lookup. A new memoised helper _get_base58_encode_tables returns (pairs, base**2, base**4, zero char) together, so one cache lookup and a tuple unpack replace the per-call arithmetic and slicing. The digit loop is unchanged, outputs are byte-identical (equivalence harness passes), and b58encode_int and the public API are untouched. Measured encode_ir ratio 0.9876; decode_ir 0.9948 and check_ir 0.9949 also improve slightly through the shared encode path."
+    }
+  ],
+  "candidate": {
+    "commit_id": "f0806387efbd937ea937e2c305a5336692a2705eb4414f68eaed4d0523ce0784",
+    "candidate_id": "bc353658052d7f84a97d4244e666ece00eaa4f36f1564f3da0d825c200caf1aa",
+    "kind": "perf",
+    "target": "encode_ir",
+    "claimed_effect": 0.9876255705410476,
+    "patch": "diff --git a/base58/__init__.py b/base58/__init__.py\n--- a/base58/__init__.py\n+++ b/base58/__init__.py\n@@ -62,6 +62,16 @@ def _get_base58_encode_pairs(alphabet: bytes) -> List[bytes]:\n     return list(map(bytes, product(alphabet, repeat=2)))\n \n \n+@_cached\n+def _get_base58_encode_tables(\n+    alphabet: bytes\n+) -> Tuple[List[bytes], int, int, bytes]:\n+    # Everything b58encode needs per alphabet: the digit pair table, the\n+    # pair base (base**2), the divisor (base**4) and the zero character\n+    sq = len(alphabet) ** 2\n+    return _get_base58_encode_pairs(alphabet), sq, sq * sq, alphabet[0:1]\n+\n+\n def b58encode_int(\n     i: int, default_one: bool = True, alphabet: bytes = BITCOIN_ALPHABET\n ) -> bytes:\n@@ -105,19 +115,16 @@ def b58encode(\n \n     # Same digit loop as b58encode_int with default_one=False, inlined to\n     # save a call per encode\n-    base = len(alphabet)\n-    sq = base * base\n-    big = sq * sq\n-    pairs = _get_base58_encode_pairs.cache.get((alphabet,))\n-    if pairs is None:\n-        pairs = _get_base58_encode_pairs(alphabet)\n+    tables = _get_base58_encode_tables.cache.get((alphabet,))\n+    if tables is None:\n+        tables = _get_base58_encode_tables(alphabet)\n+    pairs, sq, big, zero = tables\n     parts = []\n     while i:\n         i, rem = divmod(i, big)\n         # rem is a small int: two operators are cheaper than a divmod call\n         parts += pairs[rem % sq], pairs[rem // sq]\n     parts.reverse()\n-    zero = alphabet[0:1]\n     return zero * (origlen - newlen) + b''.join(parts).lstrip(zero)\n \n \n",
+    "patch_hash": "75530ae93627db560dba8dd22e4f1cce5e089e096bc681b475ad2508b1e28d54",
+    "semantic_hash": "615fb38e7f27c94eda1a302ccd9e8ea4d698af7d475bc82a6a4bb5b15a6e9a01",
+    "status": "accepted",
+    "reason": null,
+    "committed_at": 1791674313769,
+    "revealed_at": 1791674313799,
+    "finalized_at": 1791675889282,
+    "gen_id": "c5b759a8e96a5d452a17a6c6d789c0c45e5a7279a505f1333ab25d4e366b39fb"
+  },
+  "replays": [
+    {
+      "replay_id": "22edb455e27dc91b8471e3899851d83a5eb1eb90f88b9f1ab0d0821b5db8c149",
+      "kind": "replay",
+      "role": "counted",
+      "status": "revealed",
+      "replayer": "3jJHAgibtbRtbTw9T2TMadYppiFV2YzGptWMrCsgu6Xz",
+      "counted": false,
+      "apply": "ok",
+      "build": {
+        "base": "ok",
+        "cand": "ok"
+      },
+      "tests": {
+        "base_pass": 48,
+        "cand_pass": 48,
+        "cand_fail": 0
+      },
+      "equivalence_same": true,
+      "metrics": {
+        "check_ir": {
+          "base": [
+            191978620
+          ],
+          "cand": [
+            190999141
+          ],
+          "ratio": 0.9948979787436747
+        },
+        "decode_ir": {
+          "base": [
+            279046242
+          ],
+          "cand": [
+            277838368
+          ],
+          "ratio": 0.9956714199361982
+        },
+        "encode_ir": {
+          "base": [
+            243588240
+          ],
+          "cand": [
+            241012110
+          ],
+          "ratio": 0.9894242431408019
+        }
+      },
+      "env": {
+        "cores": 2,
+        "cpu_model": "DO-Regular",
+        "image_digest": "sha256:beb7b0264451a2bdc993fe5deee1e8b6275fbad7d83d593c69f7a40c64f1164d",
+        "worker_version": "lineage-sandbox/0.1.0"
+      }
+    },
+    {
+      "replay_id": "8b6949a6f115b5d776199117173fcbc1505686e6a470fae242169da7ae4c554c",
+      "kind": "replay",
+      "role": "counted",
+      "status": "revealed",
+      "replayer": "7ToydZerFjuoguBEBkdnJgFfjED2paWonAecHSVA1kjK",
+      "counted": false,
+      "apply": "ok",
+      "build": {
+        "base": "ok",
+        "cand": "ok"
+      },
+      "tests": {
+        "base_pass": 48,
+        "cand_pass": 48,
+        "cand_fail": 0
+      },
+      "equivalence_same": true,
+      "metrics": {
+        "check_ir": {
+          "base": [
+            191978614
+          ],
+          "cand": [
+            190999135
+          ],
+          "ratio": 0.9948979785842188
+        },
+        "decode_ir": {
+          "base": [
+            279046236
+          ],
+          "cand": [
+            277838374
+          ],
+          "ratio": 0.995671462846752
+        },
+        "encode_ir": {
+          "base": [
+            243588240
+          ],
+          "cand": [
+            241012110
+          ],
+          "ratio": 0.9894242431408019
+        }
+      },
+      "env": {
+        "cores": 2,
+        "cpu_model": "DO-Regular",
+        "image_digest": "sha256:beb7b0264451a2bdc993fe5deee1e8b6275fbad7d83d593c69f7a40c64f1164d",
+        "worker_version": "lineage-sandbox/0.1.0"
+      }
+    },
+    {
+      "replay_id": "2de7f9242ee65491ee3d5c91929580958bffcffbe9e9d8be4eba9198d9f8ce1e",
+      "kind": "replay",
+      "role": "counted",
+      "status": "revealed",
+      "replayer": "3jJHAgibtbRtbTw9T2TMadYppiFV2YzGptWMrCsgu6Xz",
+      "counted": true,
+      "apply": "ok",
+      "build": {
+        "base": "ok",
+        "cand": "ok"
+      },
+      "tests": {
+        "base_pass": 48,
+        "cand_pass": 48,
+        "cand_fail": 0
+      },
+      "equivalence_same": true,
+      "metrics": {
+        "check_ir": {
+          "base": [
+            189886852
+          ],
+          "cand": [
+            188907039
+          ],
+          "ratio": 0.9948400166221093
+        },
+        "decode_ir": {
+          "base": [
+            288903063
+          ],
+          "cand": [
+            287557464
+          ],
+          "ratio": 0.9953423858299488
+        },
+        "encode_ir": {
+          "base": [
+            251300331
+          ],
+          "cand": [
+            248094252
+          ],
+          "ratio": 0.9872420422717231
+        }
+      },
+      "env": {
+        "cores": 2,
+        "cpu_model": "DO-Regular",
+        "image_digest": "sha256:beb7b0264451a2bdc993fe5deee1e8b6275fbad7d83d593c69f7a40c64f1164d",
+        "worker_version": "lineage-sandbox/0.1.0"
+      }
+    },
+    {
+      "replay_id": "fef9760de594f63aa579af25dfae147e2c6ab252f178969c69cf571fe1882a26",
+      "kind": "replay",
+      "role": "counted",
+      "status": "revealed",
+      "replayer": "7ToydZerFjuoguBEBkdnJgFfjED2paWonAecHSVA1kjK",
+      "counted": true,
+      "apply": "ok",
+      "build": {
+        "base": "ok",
+        "cand": "ok"
+      },
+      "tests": {
+        "base_pass": 48,
+        "cand_pass": 48,
+        "cand_fail": 0
+      },
+      "equivalence_same": true,
+      "metrics": {
+        "check_ir": {
+          "base": [
+            189886852
+          ],
+          "cand": [
+            188907039
+          ],
+          "ratio": 0.9948400166221093
+        },
+        "decode_ir": {
+          "base": [
+            288903063
+          ],
+          "cand": [
+            287557464
+          ],
+          "ratio": 0.9953423858299488
+        },
+        "encode_ir": {
+          "base": [
+            251300331
+          ],
+          "cand": [
+            248094252
+          ],
+          "ratio": 0.9872420422717231
+        }
+      },
+      "env": {
+        "cores": 2,
+        "cpu_model": "DO-Regular",
+        "image_digest": "sha256:beb7b0264451a2bdc993fe5deee1e8b6275fbad7d83d593c69f7a40c64f1164d",
+        "worker_version": "lineage-sandbox/0.1.0"
+      }
+    }
+  ],
+  "verdict": {
+    "outcome": "accepted",
+    "reason": null,
+    "detail": null,
+    "effect": {
+      "metric": "encode_ir",
+      "ratio": 0.9872420422717231,
+      "ci_low": 0.9872420422717231,
+      "ci_high": 0.9872420422717231,
+      "per_replay": [
+        {
+          "replay_id": "2de7f9242ee65491ee3d5c91929580958bffcffbe9e9d8be4eba9198d9f8ce1e",
+          "ratio": 0.9872420422717231,
+          "ci_low": 0.9872420422717231,
+          "ci_high": 0.9872420422717231,
+          "pass": true
+        },
+        {
+          "replay_id": "fef9760de594f63aa579af25dfae147e2c6ab252f178969c69cf571fe1882a26",
+          "ratio": 0.9872420422717231,
+          "ci_low": 0.9872420422717231,
+          "ci_high": 0.9872420422717231,
+          "pass": true
+        }
+      ]
+    },
+    "digest": "9bfc9930d0958ebbe1b31c7f23977dc2c2df94f6e73bb6177c9368b30303abca"
+  },
+  "outcome": "accepted",
+  "effect": {
+    "metric": "encode_ir",
+    "ratio": 0.9872420422717231,
+    "ci_low": 0.9872420422717231,
+    "ci_high": 0.9872420422717231,
+    "gain_pct": 1.2757957728276925
+  },
+  "cost": {
+    "input_tokens": 18,
+    "output_tokens": 11906,
+    "cache_read_tokens": 87889,
+    "cache_write_tokens": 22312,
+    "usd": 0.36733,
+    "sandbox_s": 224,
+    "source": "provenance:hosted"
+  },
+  "reward": {
+    "v": 1,
+    "accepted": 1,
+    "effect": 0.012757957728276925,
+    "fixed_tests": 0,
+    "effect_per_usd": 0.03473159755064091,
+    "effect_per_sandbox_hour": 0.20503860634730772,
+    "reverted": false,
+    "inputs": [
+      "outcome",
+      "verdict.effect.ratio",
+      "cost.usd (provenance:hosted)",
+      "cost.sandbox_s (provenance:hosted)"
+    ]
+  },
+  "worker_outcome": "submitted a perf candidate on encode_ir (21 changed lines); it was committed and revealed (status queued); its verdict comes later from independent replays",
+  "journal": null,
+  "provenance": {
+    "runtime": "hosted",
+    "digest": "0076c696b2bc0244714af0dfb99b988392c3ca063cdf266194f932d679d2fedb",
+    "sig": "3NvZsZiCdeRkrUEEtA1G6UobLUfvkG7ZUhUfG3fjhkyAFaADCxayWBCRAo78ZT4jPqtzEGssiGherD6bSzvDkvYw",
+    "signer": "DCmdy5MoAfnN6fn3nVW27db62ZwtjoksqSqdjAc8VPk4"
+  },
+  "license": {
+    "repo": "https://github.com/keis/base58",
+    "spdx": "MIT",
+    "name": "MIT License",
+    "url": "https://github.com/keis/base58/blob/master/COPYING",
+    "source": "GitHub API /repos/keis/base58/license",
+    "read_on": "2026-10-10"
+  },
+  "attribution": "Code excerpts from https://github.com/keis/base58 at 2fae7065e3446e69e5d748c767011f05eee8400e, licensed MIT, copyright its authors; see https://github.com/keis/base58/blob/master/COPYING.",
+  "times": {
+    "started_at": 1791673970025,
+    "ended_at": 1791674313985,
+    "finalized_at": 1791675889282,
+    "published_at": 1791676170419
+  },
+  "verify": {
+    "session": "/v1/sessions/025cc97dfebfc9f2bc5267172934e63d0fc7e6ee332a99e8433bc4aa29207412",
+    "candidate": "/v1/candidates/f0806387efbd937ea937e2c305a5336692a2705eb4414f68eaed4d0523ce0784",
+    "generation": "/v1/generations/c5b759a8e96a5d452a17a6c6d789c0c45e5a7279a505f1333ab25d4e366b39fb",
+    "provenance": "/v1/candidates/f0806387efbd937ea937e2c305a5336692a2705eb4414f68eaed4d0523ce0784/provenance",
+    "journal": null
+  }
+}
