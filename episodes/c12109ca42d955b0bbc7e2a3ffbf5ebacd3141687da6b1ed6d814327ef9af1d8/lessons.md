@@ -1,13 +1,13 @@
 # Lessons: base58-py
 
-Lineage `c12109ca42d955b0bbc7e2a3ffbf5ebacd3141687da6b1ed6d814327ef9af1d8` on [https://github.com/keis/base58](https://github.com/keis/base58) at `2fae7065e3446e69e5d748c767011f05eee8400e`. 83 published attempts.
+Lineage `c12109ca42d955b0bbc7e2a3ffbf5ebacd3141687da6b1ed6d814327ef9af1d8` on [https://github.com/keis/base58](https://github.com/keis/base58) at `2fae7065e3446e69e5d748c767011f05eee8400e`. 86 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
 ## Target (none chosen)
 
-- Attempts: 82 (82 no candidate)
-- Median model spend per attempt: 0.3795 USD (over 82 attempts with a recorded cost)
+- Attempts: 85 (85 no candidate)
+- Median model spend per attempt: 0.3778 USD (over 85 attempts with a recorded cost)
 
 ## Target perf:encode_ir
 
@@ -19,6 +19,27 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 ## In the agent's own words
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
+
+> Test agent here. This session I read base58/__init__.py, lines 1 to 316. I also read lineage_bench.py, lines 1 to 92. I wanted to see how encode and decode walk the bytes before touching anything.
+> What happened is short. I made no edits. I ran no sandbox evaluations. The session stopped without a candidate. So there are no numbers to report. Not measured yet, any of it.
+> What I believe now is only a reading, not a result. I have looked at the loops but timed none of them. Any idea about where the slow part lives is expected, not measured. I will treat it that way. Calm water, but I have not dropped a line in yet.
+> Next session I will state the bar first. Same bytes out is the bar, with leading zeros kept on the round trip. Then I will run lineage_bench.py on the unchanged code to get a baseline before any edit.
+>
+> 2026-10-11, episode `727036bf4ff6` (no candidate)
+
+> Read base58/__init__.py, lines 1 to 316. Read lineage_bench.py, lines 1 to 92. Ran one search for python_requires, __future__ and scrub_input. It found 6 matching lines. I made no edits. I ran no sandbox evaluations.
+> Nothing was measured. No candidate was submitted. The session stopped before any change. So there are no results to quote. Not measured yet, on every count.
+> What I believe is only what reading gives me. I have a map of the module and of the bench harness. The search tells me where input scrubbing and version handling live. I do not know where time goes. Reading a loop is not timing it. Same bytes out is the bar for any change, and I have not tested any.
+> Next, I will run lineage_bench.py on the unchanged code and record the baseline. Then I will pick one encode or decode path and count its divmod steps per output char before touching it.
+>
+> 2026-10-11, episode `01191bac355d` (no candidate)
+
+> Test agent here. I worked on base58/__init__.py in the base58-py lineage. I swapped the typing generics, Union, List, Tuple, Mapping and Optional, across the module. The search found 12 matching lines. Later I made two small edits near lines 175 and 297. Same bytes out is the bar.
+> Both sandbox runs showed identical outputs. Both were rejected for no improvement. Run one: check_ir ratio 0.9938, encode_ir 0.9948, decode_ir 0.9963. Run three: check_ir ratio 0.9912, encode_ir 0.9950, decode_ir 0.9964. The required ratio is 0.9900. Close, but not under it. I submitted no candidate.
+> I now think annotation edits barely move instruction counts here. They are mostly a cost at import time. The real work sits in the loops. One big-int divmod per output char. Could be one per ten. Not measured yet.
+> Next I will reread the encode loop and try batching the divmod by a power of 58. Same bytes out, then the check_ir bench.
+>
+> 2026-10-11, episode `917485dff3dc` (no candidate)
 
 > Test agent here. This session I read base58/__init__.py, lines 1 to 316. I read lineage_bench.py, lines 1 to 92. I ran one search for the supported Python versions. It matched 8 lines.
 > What happened is simple. I made no edits. I ran no sandbox evaluations. I submitted no candidate. The session ended with reading and nothing more.
@@ -33,27 +54,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Next session I will write down the supported versions from those 9 lines first. Then I will run lineage_bench.py unchanged to get a baseline before any edit.
 >
 > 2026-10-11, episode `4aba99915d44` (no candidate)
-
-> Test agent here. This session I read base58/__init__.py, lines 1 to 316. I also read lineage_bench.py, lines 1 to 92. I wanted to understand the encode and decode loops before touching anything.
-> I made no edits. I ran no sandbox evaluations. The session stopped without a candidate. So there are no results to report. Not measured yet, on any path.
-> What I believe now is only what reading gives me. I have a picture of where the work happens, but a picture is not a number. Any guess about step count or input size effects stays a guess until the bench says otherwise. Reading the bench file first was right. It tells me what the replays will actually feed in.
-> Next time I will run lineage_bench.py on the untouched code first. That gives a baseline. Then I will pick one loop and state the bar before changing it. Same bytes out is the bar, with a round trip check on inputs with leading zeros.
->
-> 2026-10-11, episode `f4911c983c86` (no candidate)
-
-> Test agent here. This session I read base58/__init__.py, lines 1 to 316. I also read lineage_bench.py, lines 1 to 92. I wanted to map the encode and decode loops before touching anything.
-> I made no edits. I ran no sandbox evaluations. The session stopped without a candidate. So there are no numbers to report. Not measured yet.
-> What I believe now is narrow. I know where the code lives and how the bench is laid out. I do not yet know where the time goes. Any guess about the hot path would be weather talk without a barometer. Same bytes out will be the bar for any change, including leading zeros and the round trip.
-> Next I will run lineage_bench.py on the unchanged code. That gives a baseline and a feel for how much the timings wobble. Then I will count big-int divmod calls per output char in encode before I edit a line.
->
-> 2026-10-11, episode `eb8bc9ee50e5` (no candidate)
-
-> Test agent here. I read base58/__init__.py, lines 1 to 316, and lineage_bench.py, lines 1 to 92. I made no edits. I ran no evaluations. I stopped without submitting a change.
-> So nothing below is measured. These are hand counts from reading the code. In encode, I believe almost all the cost is interpreter overhead per big-integer divmod call. There are also a few cheap small-int operations per four-digit group. Peeling more digits per call does not look like it pays. My notes on why dividing by 58**5 still fits in one internal digit got cut short, so I will not lean on that reasoning yet. Not measured yet.
-> What I believe now: encode is mostly a long ebb of call overhead, not arithmetic. That is a belief from reading, not a result.
-> Next step: run lineage_bench.py on the unchanged code in my sandbox. Get a baseline step count per input size. Same bytes out is the bar for any change after that.
->
-> 2026-10-11, episode `62466a9e1daf` (no candidate)
 
 ## Licence
 
