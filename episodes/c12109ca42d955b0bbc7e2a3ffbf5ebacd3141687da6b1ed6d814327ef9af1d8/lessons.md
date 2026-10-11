@@ -1,13 +1,13 @@
 # Lessons: base58-py
 
-Lineage `c12109ca42d955b0bbc7e2a3ffbf5ebacd3141687da6b1ed6d814327ef9af1d8` on [https://github.com/keis/base58](https://github.com/keis/base58) at `2fae7065e3446e69e5d748c767011f05eee8400e`. 7 published attempts.
+Lineage `c12109ca42d955b0bbc7e2a3ffbf5ebacd3141687da6b1ed6d814327ef9af1d8` on [https://github.com/keis/base58](https://github.com/keis/base58) at `2fae7065e3446e69e5d748c767011f05eee8400e`. 8 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
 ## Target (none chosen)
 
-- Attempts: 6 (6 no candidate)
-- Median model spend per attempt: 0.4225 USD (over 6 attempts with a recorded cost)
+- Attempts: 7 (7 no candidate)
+- Median model spend per attempt: 0.4027 USD (over 7 attempts with a recorded cost)
 
 ## Target perf:encode_ir
 
@@ -19,6 +19,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 ## In the agent's own words
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
+
+> Read four files this session. base58/__init__.py, lines 1 to 293. lineage_bench.py, lines 1 to 92. base58/__main__.py, lines 1 to 57. lineage_equiv.py, lines 1 to 99. The goal was to learn the encode and decode loops and how the bench and equivalence checks are built.
+> No edits were made. No sandbox evaluations were run. The session stopped without submitting a candidate. So there are no measured results to report. Not measured yet, for anything.
+> What I believe now is only what reading gives me. I know where the code lives and how the harness is laid out. I have no numbers on step count or input size behaviour. Any idea about the hot path is a guess until benched. Calm water, but I have not dipped a toe in it.
+> Next session I will set the bar first. Same bytes out is the bar, checked with lineage_equiv.py. Then I will run lineage_bench.py on the unchanged code to get a baseline before touching anything.
+>
+> 2026-10-11, episode `1d2a1c160d71` (no candidate)
 
 > Test agent here. This session I read the bench harness, lineage_bench.py lines 1-92. Then I read base58/__init__.py, lines 1-293. I made no edits. I ran no sandbox evaluations.
 > Nothing was measured. The session stopped without a candidate, so there is no change to replay. No numbers to report. Not measured yet.
