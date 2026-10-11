@@ -1,13 +1,13 @@
 # Lessons: base58-py
 
-Lineage `c12109ca42d955b0bbc7e2a3ffbf5ebacd3141687da6b1ed6d814327ef9af1d8` on [https://github.com/keis/base58](https://github.com/keis/base58) at `2fae7065e3446e69e5d748c767011f05eee8400e`. 12 published attempts.
+Lineage `c12109ca42d955b0bbc7e2a3ffbf5ebacd3141687da6b1ed6d814327ef9af1d8` on [https://github.com/keis/base58](https://github.com/keis/base58) at `2fae7065e3446e69e5d748c767011f05eee8400e`. 13 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
 ## Target (none chosen)
 
-- Attempts: 11 (11 no candidate)
-- Median model spend per attempt: 0.4027 USD (over 11 attempts with a recorded cost)
+- Attempts: 12 (12 no candidate)
+- Median model spend per attempt: 0.4136 USD (over 12 attempts with a recorded cost)
 
 ## Target perf:encode_ir
 
@@ -19,6 +19,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 ## In the agent's own words
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
+
+> Test agent here. This session I read base58/__init__.py, lines 1 to 293. I also read lineage_bench.py, lines 1 to 92. The goal was to learn the encode and decode paths before touching anything.
+> I made no edits. I ran no sandbox evaluations. The session stopped without a candidate change. So there are no results to report. Not measured yet.
+> What I believe now is only a reading, not a finding. I have the shape of the code in my head. I do not know where the time goes. Any guess about a slow path would be weather talk without a barometer. The bar for any later change stays the same. Same bytes out is the bar, for every input, including leading zeros.
+> Next session I will run the bench as it stands, with no edits. That gives a baseline step count to compare against. Then I will pick one function and make one change.
+>
+> 2026-10-11, episode `fc0c8003048b` (no candidate)
 
 > Test agent here. This session I read base58/__init__.py, lines 1 to 293. I also read lineage_bench.py, lines 1 to 92. I wanted to see the encode and decode loops and how the bench drives them. I made no edits.
 > Nothing was measured. I ran no sandbox evaluations. The session stopped without a candidate, so there is no change to judge. Calm water, no boats out.
@@ -47,13 +54,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Next session I will run the bench on the unchanged code first, to get a baseline. Then I will pick one loop and state the bar before touching it. Same bytes out is the bar, including leading zeros and a full round trip.
 >
 > 2026-10-11, episode `4f815f78bc00` (no candidate)
-
-> Read four files this session. base58/__init__.py, lines 1 to 293. lineage_bench.py, lines 1 to 92. base58/__main__.py, lines 1 to 57. lineage_equiv.py, lines 1 to 99. The goal was to learn the encode and decode loops and how the bench and equivalence checks are built.
-> No edits were made. No sandbox evaluations were run. The session stopped without submitting a candidate. So there are no measured results to report. Not measured yet, for anything.
-> What I believe now is only what reading gives me. I know where the code lives and how the harness is laid out. I have no numbers on step count or input size behaviour. Any idea about the hot path is a guess until benched. Calm water, but I have not dipped a toe in it.
-> Next session I will set the bar first. Same bytes out is the bar, checked with lineage_equiv.py. Then I will run lineage_bench.py on the unchanged code to get a baseline before touching anything.
->
-> 2026-10-11, episode `1d2a1c160d71` (no candidate)
 
 ## Licence
 
