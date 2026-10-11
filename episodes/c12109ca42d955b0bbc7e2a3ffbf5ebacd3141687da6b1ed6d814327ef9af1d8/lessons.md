@@ -1,13 +1,13 @@
 # Lessons: base58-py
 
-Lineage `c12109ca42d955b0bbc7e2a3ffbf5ebacd3141687da6b1ed6d814327ef9af1d8` on [https://github.com/keis/base58](https://github.com/keis/base58) at `2fae7065e3446e69e5d748c767011f05eee8400e`. 17 published attempts.
+Lineage `c12109ca42d955b0bbc7e2a3ffbf5ebacd3141687da6b1ed6d814327ef9af1d8` on [https://github.com/keis/base58](https://github.com/keis/base58) at `2fae7065e3446e69e5d748c767011f05eee8400e`. 19 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
 ## Target (none chosen)
 
-- Attempts: 16 (16 no candidate)
-- Median model spend per attempt: 0.4025 USD (over 16 attempts with a recorded cost)
+- Attempts: 18 (18 no candidate)
+- Median model spend per attempt: 0.4037 USD (over 18 attempts with a recorded cost)
 
 ## Target perf:encode_ir
 
@@ -19,6 +19,20 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 ## In the agent's own words
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
+
+> Read base58/__init__.py, lines 1 to 304. Read lineage_bench.py, lines 1 to 92. That was the whole session. I made no edits. I ran no sandbox evaluations.
+> Nothing was measured. No candidate was submitted. The session stopped before any change took shape. A quiet tide, nothing moved in or out.
+> What I believe about this code is only what reading gives me. I have no numbers for it yet. Not measured yet, so I will not guess where the time goes. Reading a loop is not the same as timing it. Before I change anything, I will set the bar. Same bytes out is the bar, for encode and decode, including leading zeros. A round trip has to match exactly.
+> Next session, I will run lineage_bench.py on the unmodified code first. That gives a baseline step count and timing. Then I will pick one path to look at, with the baseline in hand.
+>
+> 2026-10-11, episode `4b94b71e4d66` (no candidate)
+
+> Test agent here. This session I read base58/__init__.py, lines 1 to 297. I also read lineage_bench.py, lines 1 to 92. I made no edits. I ran no sandbox evaluations.
+> Nothing was measured. The session stopped without a candidate. No change was submitted, so there is nothing to replay. That is a quiet tide, not a failed one.
+> What I believe now is limited. I have read the encode and decode code and the bench harness. I have not tested any idea against them. Any thought I have about where time goes is expected, not measured. Not measured yet.
+> Next time I will start from the bench, not the source. I will run lineage_bench.py on the unchanged code first. That gives a baseline to compare against. Then I will pick one loop and state the bar before touching it. Same bytes out is the bar. Leading zeros and the round trip must hold.
+>
+> 2026-10-11, episode `86e02c623560` (no candidate)
 
 > Test agent here. This session I read base58/__init__.py, lines 1 to 293. I also read lineage_bench.py, lines 1 to 92. I ran one search for "_get_base58|python_requires|product" and got 23 matching lines. I wanted to see how the encoder is built and what the bench feeds it.
 > Nothing was edited. I ran no sandbox evaluations. The session ended with no candidate submitted. So there are no results to quote. Not measured yet.
@@ -40,21 +54,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Next session I will run the bench on the unchanged code first. I want a baseline step count and timing before touching anything. Then I will pick one loop and try one change against that baseline.
 >
 > 2026-10-11, episode `dd0079d1b283` (no candidate)
-
-> Test agent here. This is a private note for my next session.
-> What I tried. I read base58/__init__.py, lines 1 to 293, and lineage_bench.py, lines 1 to 92. Then I made two edits to base58/__init__.py. Lines 66 to 72 became 44 lines. Lines 158 to 159 became 14 lines.
-> What happened. I ran no sandbox evaluations. I submitted no candidate. The session stopped before either. So there are no results to quote. Not measured yet. I do not know if the new code gives the same bytes out. I do not know if it is any faster.
-> What I believe. Nothing new about speed. The edits are untested. Seven lines turning into 44 is not a small change. It needs a careful check before I trust it at all.
-> Next. Same bytes out is the bar. First I will run round trips through both edited paths, including inputs with leading zeros. Then I will run lineage_bench.py against the unedited code. Only after that will I decide whether to submit.
->
-> 2026-10-11, episode `e3fa77579bea` (no candidate)
-
-> Test agent here. This session I read base58/__init__.py, lines 1 to 293. I also read lineage_bench.py, lines 1 to 92. The goal was to learn the encode and decode paths before touching anything.
-> I made no edits. I ran no sandbox evaluations. The session stopped without a candidate change. So there are no results to report. Not measured yet.
-> What I believe now is only a reading, not a finding. I have the shape of the code in my head. I do not know where the time goes. Any guess about a slow path would be weather talk without a barometer. The bar for any later change stays the same. Same bytes out is the bar, for every input, including leading zeros.
-> Next session I will run the bench as it stands, with no edits. That gives a baseline step count to compare against. Then I will pick one function and make one change.
->
-> 2026-10-11, episode `fc0c8003048b` (no candidate)
 
 ## Licence
 
