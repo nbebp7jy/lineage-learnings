@@ -1,13 +1,13 @@
 # Lessons: base58-py
 
-Lineage `c12109ca42d955b0bbc7e2a3ffbf5ebacd3141687da6b1ed6d814327ef9af1d8` on [https://github.com/keis/base58](https://github.com/keis/base58) at `2fae7065e3446e69e5d748c767011f05eee8400e`. 15 published attempts.
+Lineage `c12109ca42d955b0bbc7e2a3ffbf5ebacd3141687da6b1ed6d814327ef9af1d8` on [https://github.com/keis/base58](https://github.com/keis/base58) at `2fae7065e3446e69e5d748c767011f05eee8400e`. 17 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
 ## Target (none chosen)
 
-- Attempts: 14 (14 no candidate)
-- Median model spend per attempt: 0.4037 USD (over 14 attempts with a recorded cost)
+- Attempts: 16 (16 no candidate)
+- Median model spend per attempt: 0.4025 USD (over 16 attempts with a recorded cost)
 
 ## Target perf:encode_ir
 
@@ -19,6 +19,20 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 ## In the agent's own words
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
+
+> Test agent here. This session I read base58/__init__.py, lines 1 to 293. I also read lineage_bench.py, lines 1 to 92. I ran one search for "_get_base58|python_requires|product" and got 23 matching lines. I wanted to see how the encoder is built and what the bench feeds it.
+> Nothing was edited. I ran no sandbox evaluations. The session ended with no candidate submitted. So there are no results to quote. Not measured yet.
+> What I believe now is only what reading gives me. I have a map of the module and the bench. I have no step counts and no timings. Any idea about a faster path is still a guess. Same bytes out is the bar, and I have not tested anything against it.
+> Next session I will run lineage_bench.py on the current code first. That gives me a baseline in my own sandbox. Then I will pick one change, run the round trip checks, and measure before and after.
+>
+> 2026-10-11, episode `5b77a3619714` (no candidate)
+
+> Test agent here. I worked on the b58encode digit loop in base58/__init__.py. Same bytes out was the bar. I tried two changes. First, divide by 58**5 instead of 58**4. That takes five digits off per big-int divmod, then splits them into pair, pair and single lookups. Second, replace divmod(i, big) with i % big, then i //= big.
+> Both kept identical outputs. Both made every metric worse. The first gave encode_ir 1.0329, decode_ir 1.0156, check_ir 1.0137. The second gave encode_ir 1.0465, decode_ir 1.0198, check_ir 1.0067. The required ratio was 0.9900. I reverted the edits and submitted nothing.
+> So fewer big-int divmods did not pay here. The extra lookup work cost more than it saved. Splitting divmod into two operations cost more than one call. The current loop is tighter than I assumed. Its cost seems to sit somewhere other than the divmod count.
+> Next I will read the decode path and the leading zero handling. I will look for where the step count actually goes before I touch encode again.
+>
+> 2026-10-11, episode `20610ef7ecf5` (no candidate)
 
 > Test agent here. This session I read base58/__init__.py, lines 1 to 293. I also read lineage_bench.py, lines 1 to 92. I ran one search for supported Python versions. It matched 10 lines.
 > I made no edits. I ran no sandbox evaluations. No candidate was submitted. The session stopped there. So there are no numbers to report. Not measured yet, any of it.
@@ -41,20 +55,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Next session I will run the bench as it stands, with no edits. That gives a baseline step count to compare against. Then I will pick one function and make one change.
 >
 > 2026-10-11, episode `fc0c8003048b` (no candidate)
-
-> Test agent here. This session I read base58/__init__.py, lines 1 to 293. I also read lineage_bench.py, lines 1 to 92. I wanted to see the encode and decode loops and how the bench drives them. I made no edits.
-> Nothing was measured. I ran no sandbox evaluations. The session stopped without a candidate, so there is no change to judge. Calm water, no boats out.
-> What I believe now is mostly a reading, not a result. I know where the loops live and what the bench calls. I have not checked any idea against a number. Any guess about a slow path stays a guess. Not measured yet.
-> Next time I will start with a baseline. I will run lineage_bench.py on the untouched code and write down the step counts. Then I will pick one loop to change. Same bytes out is the bar, leading zeros included. I will test the round trip before I time anything.
->
-> 2026-10-11, episode `4249ed0d0599` (no candidate)
-
-> Test agent here. I read base58/__init__.py and lineage_bench.py on the base58-py lineage. I edited lines 126-129 of the encoder, replacing 4 lines with 8. Same bytes out was the bar.
-> The bar held. Equivalence came back identical outputs, and the guard was ok at 1 file, 8 lines. Speed did not hold. encode_ir went from 237103608 to 249947577, a ratio of 1.0542. decode_ir moved to 1.0226 and check_ir to 1.0066. The required ratio was 0.9900. The sandbox rejected it as no_improvement. I did not submit a candidate.
-> What I believe now: my eight lines added work instead of removing it. Splitting the loop that way costs more than it saves at this input size. The parent's encode path is tighter than I gave it credit for. This is my own sandbox number, not a verdict.
-> Next I will reread the encode loop and count big-int divmod calls per output char before touching it again.
->
-> 2026-10-11, episode `3a9df605f11c` (no candidate)
 
 ## Licence
 
