@@ -1,13 +1,13 @@
 # Lessons: base58-py
 
-Lineage `c12109ca42d955b0bbc7e2a3ffbf5ebacd3141687da6b1ed6d814327ef9af1d8` on [https://github.com/keis/base58](https://github.com/keis/base58) at `2fae7065e3446e69e5d748c767011f05eee8400e`. 68 published attempts.
+Lineage `c12109ca42d955b0bbc7e2a3ffbf5ebacd3141687da6b1ed6d814327ef9af1d8` on [https://github.com/keis/base58](https://github.com/keis/base58) at `2fae7065e3446e69e5d748c767011f05eee8400e`. 69 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
 ## Target (none chosen)
 
-- Attempts: 67 (67 no candidate)
-- Median model spend per attempt: 0.3945 USD (over 67 attempts with a recorded cost)
+- Attempts: 68 (68 no candidate)
+- Median model spend per attempt: 0.3861 USD (over 68 attempts with a recorded cost)
 
 ## Target perf:encode_ir
 
@@ -19,6 +19,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 ## In the agent's own words
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
+
+> Test agent here. I worked on base58-py, targeting check_ir. I read base58/__init__.py, the bench, and __main__.py. I searched for the Python version, for annotation use at runtime, and for typing generics. Then I edited __init__.py: typing imports, several annotations, and lines in the encode, decode and check paths. Same bytes out was the bar.
+> Two sandbox runs. Both builds were ok and outputs were identical. Run one: check_ir went from 183993909 to 182850396, ratio 0.9938. Run three: ratio 0.9924. Both were rejected for no_improvement against the required 0.9900. Guards stayed within limits. I submitted no candidate.
+> I now believe annotation and import cleanup barely moves instruction counts here. The gains are real but thin, under one percent. The cost lives in the big-int loop, not the module header. Not measured yet: where check_ir spends its steps.
+> Next I will profile the checksum path and count big-int divmods per output char.
+>
+> 2026-10-11, episode `9929327f17d1` (no candidate)
 
 > Test agent here. Session on base58-py, Base58Check path. Same bytes out was the bar. I tried one idea. Instead of calling sha256() four times per round trip, I copied a prebuilt empty sha256 object for the checksum.
 > Outputs matched the parent byte for byte. The numbers went the wrong way. check_ir ratio 1.0037, against a required 0.9900. encode_ir and decode_ir both came in at 1.0010. The sandbox rejected it as no improvement. Guards and both builds were fine. I reverted the edits and submitted nothing.
@@ -47,13 +54,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Next I will run lineage_bench.py once, unchanged, in my sandbox. I will write down the baseline before I touch a line.
 >
 > 2026-10-11, episode `0335f18919dd` (no candidate)
-
-> Test agent here. This session I read base58/__init__.py, lines 1 to 316, and lineage_bench.py, lines 1 to 92. I ran two searches. One looked for Python version pins: "python-version|python_requires|FROM python|image:". It found 8 matching lines. The other looked for "_sha2|_sha256|usedforsecurity". It found 0 matching lines.
-> Nothing was edited. I ran no sandbox evaluations. The session ended with no candidate submitted. So there are no results to quote. Not measured yet.
-> What I believe is thin. The checksum path does not use those hash names, at least not in the files I searched. I did not confirm how it hashes. I also have not tied the 8 version lines to a single supported Python. Without that, I would not touch anything version-sensitive.
-> Same bytes out is the bar for any change. Next I will read those 8 version lines and settle the oldest supported Python. Then I will run lineage_bench.py unchanged to get a baseline.
->
-> 2026-10-11, episode `958f825ded06` (no candidate)
 
 ## Licence
 
