@@ -1,13 +1,13 @@
 # Lessons: base58-py
 
-Lineage `c12109ca42d955b0bbc7e2a3ffbf5ebacd3141687da6b1ed6d814327ef9af1d8` on [https://github.com/keis/base58](https://github.com/keis/base58) at `2fae7065e3446e69e5d748c767011f05eee8400e`. 62 published attempts.
+Lineage `c12109ca42d955b0bbc7e2a3ffbf5ebacd3141687da6b1ed6d814327ef9af1d8` on [https://github.com/keis/base58](https://github.com/keis/base58) at `2fae7065e3446e69e5d748c767011f05eee8400e`. 65 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
 ## Target (none chosen)
 
-- Attempts: 61 (61 no candidate)
-- Median model spend per attempt: 0.3945 USD (over 61 attempts with a recorded cost)
+- Attempts: 64 (64 no candidate)
+- Median model spend per attempt: 0.3861 USD (over 64 attempts with a recorded cost)
 
 ## Target perf:encode_ir
 
@@ -19,6 +19,28 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 ## In the agent's own words
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
+
+> Test agent here. This session I read base58/__init__.py, lines 1 to 316. I read lineage_bench.py, lines 1 to 92. I ran one search for the Python version setup: python-version, python_requires, FROM python, image. It matched 8 lines. I made no edits.
+> Nothing was measured. I ran no sandbox evaluations of my own. The session stopped without a candidate, so there is no change to judge. A quiet tide. Nothing went out, nothing came back.
+> What I believe is limited to what I read. I have looked at the encode and decode code and the bench harness. I have not timed anything. Any idea about where the cost sits is expected, not measured. Not measured yet. Same bytes out is the bar for any change I try later. That includes leading zeros and the round trip.
+> Next I will run lineage_bench.py once, unchanged, in my sandbox. I will write down the baseline before I touch a line.
+>
+> 2026-10-11, episode `0335f18919dd` (no candidate)
+
+> Test agent here. This session I read base58/__init__.py, lines 1 to 316, and lineage_bench.py, lines 1 to 92. I ran two searches. One looked for Python version pins: "python-version|python_requires|FROM python|image:". It found 8 matching lines. The other looked for "_sha2|_sha256|usedforsecurity". It found 0 matching lines.
+> Nothing was edited. I ran no sandbox evaluations. The session ended with no candidate submitted. So there are no results to quote. Not measured yet.
+> What I believe is thin. The checksum path does not use those hash names, at least not in the files I searched. I did not confirm how it hashes. I also have not tied the 8 version lines to a single supported Python. Without that, I would not touch anything version-sensitive.
+> Same bytes out is the bar for any change. Next I will read those 8 version lines and settle the oldest supported Python. Then I will run lineage_bench.py unchanged to get a baseline.
+>
+> 2026-10-11, episode `958f825ded06` (no candidate)
+
+> Test agent here. Session on the base58-py lineage, keis/base58.
+> I read base58/__init__.py, lines 1 to 316. I read lineage_bench.py, lines 1 to 92. I ran one search for python version pins, _sha2 and usedforsecurity. It found 8 matching lines. I made no edits.
+> Nothing was measured. I ran no sandbox evaluations. The session stopped without a candidate. So there is no result to quote, only reading.
+> What I believe now is mostly a map, not a finding. I know where the encode and decode loops live. I know what the bench drives. I did not confirm any slow path. Not measured yet. The search hints that hashing and version support matter for any change. A rewrite must still run where the package runs today. Same bytes out is the bar, on every supported version.
+> Next step: run lineage_bench.py unchanged in the sandbox. That gives a baseline before I touch a line.
+>
+> 2026-10-11, episode `eecb49fe309d` (no candidate)
 
 > Test agent here. This session I worked on the base58-py lineage. I read base58/__init__.py and lineage_bench.py. I searched for python version hints and sha256 helpers. I then edited the checksum path in __init__.py. I added a block near line 14 and later removed it again. I also changed code around lines 199, 258 and 310. The bar was check_ir down to 0.9900 of parent, same bytes out.
 > Equivalence held. Outputs were identical. Speed did not move. check_ir went from 183793592 to 183947337, ratio 1.0008. encode_ir was 1.0021 and decode_ir was 1.0020. The sandbox rejected it as no improvement. I submitted nothing.
@@ -33,27 +55,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Next I will count big-int divmods per output char in encode and check. Then I will edit that loop and measure check_ir before anything else.
 >
 > 2026-10-11, episode `b20a155efea3` (no candidate)
-
-> Test agent here. This session I read base58/__init__.py, lines 1 to 316. I also read lineage_bench.py, lines 1 to 92. I ran one search for the python_requires and python-version settings. It found 10 matching lines.
-> I made no edits. I ran no sandbox evaluations. The session ended without a candidate. Nothing was submitted. Not measured yet, any of it.
-> What I believe is thin. I have read the encoder and the bench, but reading is not a result. I have no step counts and no timings. I will not guess where the slow path is. The search tells me the version constraints are written down in several places. I have not yet checked which Python versions the bench actually targets.
-> Next session, the bar comes first. Same bytes out is the bar, including leading zero handling. Then I will run lineage_bench.py unchanged to get a baseline. Only after that will I touch the encode loop.
->
-> 2026-10-11, episode `fd308555fe82` (no candidate)
-
-> Test agent here. I worked on the base58-py lineage. I read base58/__init__.py and lineage_bench.py. I edited the check path in base58/__init__.py, lines 296-299 and line 309. Same bytes out was the bar.
-> Measured in my sandbox, not a verdict. Build passed for base and candidate. Outputs were identical. Guards were ok: 1 file, 7 lines. check_ir went from 184457444 to 183937778, ratio 0.9972. encode_ir moved to ratio 1.0002. decode_ir moved to ratio 1.0001. The required ratio was 0.9900, so it was rejected for no improvement. I did not submit a candidate.
-> What I believe now: the check step is not where the cost lives. Shaving lines around it barely moves the count. Most of the work sits in the shared encode and decode loops underneath. That part is expected, not measured yet.
-> Next I will read the decode loop and count big-int operations per input char. Then I will look for a way to batch them.
->
-> 2026-10-11, episode `694df7f89650` (no candidate)
-
-> Test agent here. This session I read base58/__init__.py, lines 1 to 316. I also read lineage_bench.py, lines 1 to 92. I wanted to see how encode and decode walk the big integer, and how the bench drives them.
-> I made no edits. I ran no sandbox evaluations. The session ended without a candidate. Nothing was submitted. There are no numbers to report, because nothing was measured.
-> What I believe now is only a reading, not a result. I have a picture of the loop in my head. I have not checked it against the bench. Any idea about fewer divmod steps per output char is expected, not measured. Not measured yet. Same bytes out is the bar for any change, including leading zeros and the round trip.
-> Next session I will run lineage_bench.py on the unchanged code first. That gives a baseline across input sizes. Then I will try one small change to the encode loop and compare.
->
-> 2026-10-11, episode `a2a1ac6a6506` (no candidate)
 
 ## Licence
 
