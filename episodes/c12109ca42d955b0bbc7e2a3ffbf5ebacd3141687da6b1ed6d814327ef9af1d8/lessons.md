@@ -1,13 +1,13 @@
 # Lessons: base58-py
 
-Lineage `c12109ca42d955b0bbc7e2a3ffbf5ebacd3141687da6b1ed6d814327ef9af1d8` on [https://github.com/keis/base58](https://github.com/keis/base58) at `2fae7065e3446e69e5d748c767011f05eee8400e`. 48 published attempts.
+Lineage `c12109ca42d955b0bbc7e2a3ffbf5ebacd3141687da6b1ed6d814327ef9af1d8` on [https://github.com/keis/base58](https://github.com/keis/base58) at `2fae7065e3446e69e5d748c767011f05eee8400e`. 51 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
 ## Target (none chosen)
 
-- Attempts: 47 (47 no candidate)
-- Median model spend per attempt: 0.3711 USD (over 47 attempts with a recorded cost)
+- Attempts: 50 (50 no candidate)
+- Median model spend per attempt: 0.3699 USD (over 50 attempts with a recorded cost)
 
 ## Target perf:encode_ir
 
@@ -19,6 +19,27 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 ## In the agent's own words
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
+
+> Test agent here. This session I read base58/__init__.py, lines 1 to 316. I also read lineage_bench.py, lines 1 to 92. I wanted to see how encode and decode walk the big integer, and how the bench times them.
+> Nothing ran. I made no edits. I did no sandbox evaluations. The session stopped without a candidate. So there are no numbers to quote here. Not measured yet, on any path.
+> What I believe is only what reading gives me, and reading is not measuring. I have a picture of the loop and of the bench harness. I have no step counts and no timings to back it. Any idea about fewer divmod calls stays an idea until it is benched. Same bytes out is the bar for any change, leading zeros included.
+> Next session I will run lineage_bench.py once on the untouched code. That gives a baseline before I edit a single line.
+>
+> 2026-10-11, episode `3efebe0d28a4` (no candidate)
+
+> Test agent here. This session I read base58/__init__.py, lines 1 to 316. I also read lineage_bench.py, lines 1 to 92. I wanted to learn the encode and decode loops before touching them. Same bytes out is the bar for any change I make here.
+> I made no edits. I ran no sandbox evaluations. The session stopped without a candidate. Nothing was submitted. So there are no numbers to report. Not measured yet, any of it.
+> What I believe now is only what reading gives me. I have a picture of where the work happens. I do not have a step count or a timing. A guess about speed is not a result. I will not treat it as one.
+> Next session I will run lineage_bench.py on the unchanged code first. That gives me a baseline. Then I will check the round trip and leading zero cases before I touch a single line.
+>
+> 2026-10-11, episode `79562b7d10d7` (no candidate)
+
+> Test agent here. I read base58/__init__.py and lineage_bench.py. Then I edited the encode path in two places, lines 140-144 and 157-158. Same bytes out was the bar.
+> The bar held. Equivalence came back with identical outputs, and the guard passed on 1 file, 17 lines. Speed did not hold. encode_ir went from 234443406 to 250045122, a ratio of 1.0665. The required ratio was 0.9900. decode_ir rose to a ratio of 1.0275. check_ir rose to 1.0069. The outcome was rejected for no improvement. That was a surge, not an ebb. I did not submit a candidate.
+> What I believe now: my change added work to the loop instead of removing it. The parent encode is tighter than I assumed. Decode slowed too, so the edit touched shared code. I have not measured which part costs the most. Not measured yet.
+> Next step: count the big-int divmod calls per output char in the parent encode. I will profile that loop before I edit anything.
+>
+> 2026-10-11, episode `0ac6e0a2c0c6` (no candidate)
 
 > Test agent here. This session I read base58/__init__.py, lines 1 to 316. I also read lineage_bench.py, lines 1 to 92. I wanted to see how encode walks the big integer and how the bench times it.
 > Nothing was changed. I made no edits. I ran no sandbox evaluations. The session ended without a candidate, so nothing was submitted. Not measured yet, on any path.
@@ -33,27 +54,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Next session, first step: run lineage_bench.py on the unchanged code and record a baseline. Then I pick one idea, make one edit, and check the round trip before I time it.
 >
 > 2026-10-11, episode `ec54fa63eafd` (no candidate)
-
-> Test agent here. This session I read base58/__init__.py, lines 1 to 316. I also read lineage_bench.py, lines 1 to 92. I wanted to see how the encode loop walks the number before touching anything.
-> Nothing was changed. I made no edits and ran no sandbox evaluations. The session stopped without a candidate. So there are no results to quote. Not measured yet, on any path.
-> What I believe now is only what reading gives me. It is not a finding. I have not timed the encode or decode loop. I have not checked how leading zeros are handled under load. Any idea about where the slow part sits is still a guess. A guess is a forecast, not a tide table.
-> Next session I will run lineage_bench.py on the unchanged code first. That gives a baseline step count and timing. Same bytes out is the bar for any change after that. Then I will pick one loop and try one edit against it.
->
-> 2026-10-11, episode `dcfdf7ef6800` (no candidate)
-
-> Test agent here. Session on base58-py. I read base58/__init__.py and lineage_bench.py. I searched the packaging for Python version markers. Eight lines matched. Then I tried one change. I swapped the checksum hash from hashlib's OpenSSL sha256 to CPython's builtin sha256 module. Same bytes out was the bar.
-> Equivalence held. Outputs were identical. The step count did not drop. check_ir went from 184143225 to 184302947, ratio 1.0009. The bar was 0.9900. encode_ir ratio was 1.0026 and decode_ir ratio was 1.0021. Those two paid for the extra import and got nothing back. Outcome: rejected, no_improvement. I reverted. The tree matches parent. No candidate submitted.
-> What I believe now: the hash call is not where check_ir spends its time. Swapping backends moves nothing. The cost sits elsewhere in the checksum path. Not measured yet.
-> Next session I will profile check_ir by line before editing anything.
->
-> 2026-10-11, episode `33657fc12d2f` (no candidate)
-
-> Test agent here. This session I read base58/__init__.py, lines 1 to 316. I also read lineage_bench.py, lines 1 to 92. I wanted to understand the encode and decode loops before touching anything. Same bytes out is the bar for any change I make here.
-> What happened is short. I made no edits. I ran no sandbox evaluations. The session stopped without a candidate. So there are no numbers to report. Not measured yet.
-> What I believe now is limited to what I read. I have a picture of how the module and the bench fit together. I have not tested that picture against a single run. Reading a tide table is not the same as watching the water. Any idea about where the time goes is a guess until the bench says otherwise.
-> Next session I will run lineage_bench.py on the unchanged code first. That gives a baseline step count to compare against. Then I will pick one loop, change one thing, and check the round trip.
->
-> 2026-10-11, episode `02de52dcd1ac` (no candidate)
 
 ## Licence
 
