@@ -1,6 +1,6 @@
 # Lessons: base58-py
 
-Lineage `c12109ca42d955b0bbc7e2a3ffbf5ebacd3141687da6b1ed6d814327ef9af1d8` on [https://github.com/keis/base58](https://github.com/keis/base58) at `2fae7065e3446e69e5d748c767011f05eee8400e`. 160 published attempts.
+Lineage `c12109ca42d955b0bbc7e2a3ffbf5ebacd3141687da6b1ed6d814327ef9af1d8` on [https://github.com/keis/base58](https://github.com/keis/base58) at `2fae7065e3446e69e5d748c767011f05eee8400e`. 161 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
@@ -19,11 +19,11 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 ## Target perf:decode_ir
 
-- Attempts: 4 (2 no candidate, 2 accepted)
+- Attempts: 5 (3 no candidate, 2 accepted)
 - Best accepted effect: 1.69% (ratio 0.9831), episode `b9c9778dca21`
 - Accepted effects: 1.69%, 1.06%
 - Files changed by accepted candidates: `base58/__init__.py`
-- Median model spend per attempt: 0.4588 USD (over 4 attempts with a recorded cost)
+- Median model spend per attempt: 0.3663 USD (over 5 attempts with a recorded cost)
 
 ## Target perf:check_ir
 
@@ -33,6 +33,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 ## In the agent's own words
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
+
+> Test agent here. I tried grouping by base**5 in b58encode instead of base**4. base**5 still fits in one 30-bit int digit. For a 32-byte input that means 9 big-int divmods instead of 11. The cost is per group. Each group of 5 digits needs 4 small-int operations and 3 table lookups instead of 2 and 2. Same bytes out was the bar. I also touched the lines at 81-87 and then put them back.
+> Measured: outputs were identical, and every metric got worse. encode_ir went from 220872884 to 229957383, ratio 1.0411. The required ratio was 0.9900. decode_ir came in at 1.0186 and check_ir at 1.0183. Rejected as no improvement. I submitted nothing.
+> What I believe now: at these input sizes, saving two big-int divmods does not pay for the extra small-int work per group. The divmod count is not the whole story here.
+> Next I will count the per-group operations in the base**4 path line by line. I want to see whether any lookup or step can go before I touch the group size again.
+>
+> 2026-10-12, episode `6d6c16065070` (no candidate)
 
 > Test agent here. I tried a divide-and-conquer split in b58encode for integers over 1024 bits. Same bytes out was the bar. The idea was to halve the integer with divmod by cached powers of base**4. Each half was then encoded, padded to a fixed number of groups.
 > Outputs were identical. The speed was not there. encode_ir went from 223227183 to 232895031, ratio 1.0433. The bar was 0.9900. decode_ir rose to ratio 1.0230 and check_ir to 1.0102. Guards were fine and both builds passed. The outcome was rejected for no improvement. I reverted the edits and submitted nothing.
@@ -61,13 +68,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Next I will read the replay results. If 0.9890 holds, I will count divmods per output char in the inner loop.
 >
 > 2026-10-12, episode `f9c471127d0f` (accepted)
-
-> Test agent here. I read base58/__init__.py and lineage_bench.py. In b58decode each call made two cache lookups, and each built a tuple key. One fetched the translate table. One fetched the lane-merge steps by base and bit length. I added one cached plan per alphabet and autofix. It holds the table plus merge steps for inputs up to 2**11 digits, indexed by (len(digits) - 1).bit_length(). Longer inputs fall back to a cached helper. So one dict lookup per call. Same bytes out was the bar.
-> Measured in my sandbox: identical outputs, guard ok, 46 lines. decode_ir went from 265754913 to 261198992, ratio 0.9829. encode_ir moved 1.0050 and check_ir 1.0033, both within limits. It is queued for replay. No verdict yet.
-> I think the decode gain is per-call overhead, not the core loop. Encode and check drifting up is likely choppy water, but that is not measured yet.
-> Next I will see if encode carries the same double lookup.
->
-> 2026-10-12, episode `b9c9778dca21` (accepted)
 
 ## Licence
 
