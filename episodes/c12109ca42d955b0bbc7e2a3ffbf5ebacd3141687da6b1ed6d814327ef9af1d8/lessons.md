@@ -1,6 +1,6 @@
 # Lessons: base58-py
 
-Lineage `c12109ca42d955b0bbc7e2a3ffbf5ebacd3141687da6b1ed6d814327ef9af1d8` on [https://github.com/keis/base58](https://github.com/keis/base58) at `2fae7065e3446e69e5d748c767011f05eee8400e`. 194 published attempts.
+Lineage `c12109ca42d955b0bbc7e2a3ffbf5ebacd3141687da6b1ed6d814327ef9af1d8` on [https://github.com/keis/base58](https://github.com/keis/base58) at `2fae7065e3446e69e5d748c767011f05eee8400e`. 196 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
@@ -11,11 +11,11 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 ## Target perf:encode_ir
 
-- Attempts: 14 (2 accepted, 12 no candidate)
+- Attempts: 15 (2 accepted, 13 no candidate)
 - Best accepted effect: 1.28% (ratio 0.9872), episode `ec06f3aab190`
 - Accepted effects: 1.28%, 1.16%
 - Files changed by accepted candidates: `base58/__init__.py`
-- Median model spend per attempt: 0.3835 USD (over 14 attempts with a recorded cost)
+- Median model spend per attempt: 0.3997 USD (over 15 attempts with a recorded cost)
 
 ## Target perf:decode_ir
 
@@ -27,15 +27,29 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 ## Target perf:check_ir
 
-- Attempts: 15 (13 no candidate, 2 accepted)
+- Attempts: 16 (14 no candidate, 2 accepted)
 - Best accepted effect: 1.26% (ratio 0.9874), episode `28e22e8063e9`
 - Accepted effects: 1.26%, 1.11%
 - Files changed by accepted candidates: `base58/__init__.py`
-- Median model spend per attempt: 0.3379 USD (over 15 attempts with a recorded cost)
+- Median model spend per attempt: 0.3375 USD (over 16 attempts with a recorded cost)
 
 ## In the agent's own words
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
+
+> I worked on check_ir in base58/__init__.py. I tried to cut module load cost by removing code. I dropped the itertools import and replaced the product fallback with a comprehension. I removed the redundant memo on the encode pair builder. I folded the decode map builder into the decode table builder. Same bytes out was the bar.
+> Outputs were identical, and build and guard were both ok. The gain was too small. check_ir went from 177810081 to 177386381, a ratio of 0.9976. encode_ir was 0.9982 and decode_ir was 0.9987. The required ratio is 0.9900, so the sandbox rejected it as no improvement. I gave up and submitted nothing.
+> Import-time trimming is near its floor here. Four edits moved the needle by a ripple, not a tide. The remaining cost is likely in the encode and decode loops, not in setup. That is expected, not measured yet.
+> Next I will count big-int divmod calls per output char in the encode path. I will check whether batching them is possible without changing any bytes.
+>
+> 2026-10-12, episode `9dec1e84bd30` (no candidate)
+
+> Test agent here. I read base58/__init__.py and lineage_bench.py. Same bytes out was the bar. I unrolled the digit loop in b58encode. It now does eight base**4 groups per pass, then one straight-line block of four groups. I edited it three times, and the final guarded diff was 28 lines.
+> Measured in my sandbox, not a verdict. Both builds passed and outputs were identical. encode_ir went from 214878720 to 214078138, a ratio of 0.9963. The required ratio was 0.9900, so the change was rejected for no improvement. decode_ir rose to ratio 1.0018 and check_ir to 1.0054. I submitted no candidate.
+> What I believe now. The per-digit work is already lean. Each step is one single-limb divmod per four digits, plus pair lookups. Unrolling trims loop overhead and little else. The remaining cost likely sits outside that loop. Not measured yet.
+> Next I will profile b58encode by section before touching it. I want to see how its cost splits between the leading zero handling, the integer conversion and the digit loop.
+>
+> 2026-10-12, episode `8b761c1570be` (no candidate)
 
 > Test agent here. I read base58/__init__.py and lineage_bench.py. I tried one change to the final lane-merge step in b58decode and b58decode_int. Old way: subtract hi * (256**h - base**h). New way: multiply the high half by base**h, then add the masked low half. That is a smaller big-int product. Same bytes out was the bar. Three edits, one file, 19 lines.
 > Measured in my sandbox, not a verdict. Equivalence held, with identical outputs. But decode_ir went from 254524850 to 254818106, ratio 1.0012. The required ratio was 0.9900. encode_ir moved to ratio 1.0007 and check_ir to 1.0027. Outcome: rejected, no improvement. I did not submit a candidate.
@@ -57,20 +71,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Next, I will read lineage_bench.py again and note the input sizes it uses. Then I will try a change that adds almost no code.
 >
 > 2026-10-12, episode `29c2b6ba5228` (no candidate)
-
-> Test agent here. I worked on decode in base58/__init__.py. Same bytes out was the bar. I split long digit strings in half, merged each half on its own, then joined them with one balanced multiply.
-> Three tries, all with identical outputs. None reached the 1% minimum. Splitting above 256 digits gave a decode_ir ratio of 0.9924. Splitting above 128 gave 0.9990. A compact helper gave 0.9945. The extra code also raised encode_ir and check_ir. Ratios were 1.0079 and 1.0101 on the first two tries, and 1.0048 and 1.0066 on the third. I submitted no candidate.
-> I think the split itself helps decode a little. Module load cost seems to eat about half of that gain. This is my reading of the numbers and I have not measured it directly. On these input sizes the long ebb is not in the merge alone.
-> Next I will measure import cost on its own, with and without the helper. If it is the drag, I will try the split with less added code.
->
-> 2026-10-12, episode `523b8f8943a5` (no candidate)
-
-> Test agent here. This session was on base58-py, aiming at check_ir. Same bytes out was the bar. I read base58/__init__.py and lineage_bench.py. Then I made nine edits across three tries. The best try had b58decode_int reuse b58decode's lane merging. It also removed unused memoisers, used the built-in _sha2 sha256 constructor and dropped the itertools import.
-> All three kept identical outputs. None cleared the bar. Evaluation 1 gave a check_ir ratio of 0.9950. Evaluation 3 gave 0.9958, and encode_ir rose to 1.0095. Evaluation 5 was the best at 0.9917, against a required 0.9900. In that run encode_ir was 0.9967 and decode_ir was 0.9989. I gave up and submitted nothing.
-> I now think the cheap wins in check are mostly taken. Import and constructor trims move the needle a little, not enough. The remaining cost likely sits in the hash and big-int work itself. Not measured yet.
-> Next I will profile check_ir by line before editing anything.
->
-> 2026-10-12, episode `81571526b035` (no candidate)
 
 ## Licence
 
