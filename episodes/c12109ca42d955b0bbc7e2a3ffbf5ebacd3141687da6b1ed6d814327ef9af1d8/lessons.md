@@ -1,6 +1,6 @@
 # Lessons: base58-py
 
-Lineage `c12109ca42d955b0bbc7e2a3ffbf5ebacd3141687da6b1ed6d814327ef9af1d8` on [https://github.com/keis/base58](https://github.com/keis/base58) at `2fae7065e3446e69e5d748c767011f05eee8400e`. 178 published attempts.
+Lineage `c12109ca42d955b0bbc7e2a3ffbf5ebacd3141687da6b1ed6d814327ef9af1d8` on [https://github.com/keis/base58](https://github.com/keis/base58) at `2fae7065e3446e69e5d748c767011f05eee8400e`. 180 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
@@ -11,19 +11,19 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 ## Target perf:encode_ir
 
-- Attempts: 9 (2 accepted, 7 no candidate)
+- Attempts: 10 (2 accepted, 8 no candidate)
 - Best accepted effect: 1.28% (ratio 0.9872), episode `ec06f3aab190`
 - Accepted effects: 1.28%, 1.16%
 - Files changed by accepted candidates: `base58/__init__.py`
-- Median model spend per attempt: 0.3673 USD (over 9 attempts with a recorded cost)
+- Median model spend per attempt: 0.3835 USD (over 10 attempts with a recorded cost)
 
 ## Target perf:decode_ir
 
-- Attempts: 9 (7 no candidate, 2 accepted)
+- Attempts: 10 (8 no candidate, 2 accepted)
 - Best accepted effect: 1.69% (ratio 0.9831), episode `b9c9778dca21`
 - Accepted effects: 1.69%, 1.06%
 - Files changed by accepted candidates: `base58/__init__.py`
-- Median model spend per attempt: 0.3838 USD (over 9 attempts with a recorded cost)
+- Median model spend per attempt: 0.4203 USD (over 10 attempts with a recorded cost)
 
 ## Target perf:check_ir
 
@@ -36,6 +36,20 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 ## In the agent's own words
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
+
+> Test agent here. Session on base58-py, encode path in base58/__init__.py. Same bytes out was the bar. I changed the long-value loop to divide by base**5 instead of base**4. That still fits in one internal int digit. I used it only for values above base**120.
+> Outputs were identical to the parent. That part held. Every metric got worse. encode_ir went from 217772683 to 222273497, ratio 1.0207. decode_ir ratio 1.0106. check_ir ratio 1.0066. The sandbox rejected it as no improvement against a required 0.9900. I submitted nothing.
+> What I now believe is this. Fewer big-int divmods do not pay here. Splitting each remainder into five digits costs more small-int operations than the divmods save. The chunk size is not the lever. I am not sure where the lever is yet.
+> Next I will profile the remainder split itself. I will count operations per output char before touching the divisor again.
+>
+> 2026-10-12, episode `d119c42f4a84` (no candidate)
+
+> Test agent here. This session was on base58-py. The target was decode_ir. Same bytes out was the bar. The first attempt swapped the dict.get plan lookups in b58encode and b58decode for try and subscript. It also keyed the decode merge plans directly by digit count. That drops one bit_length call per decode. The second attempt added more changes in the same file, including folding _get_base58_decode_map into the decode setup.
+> Both builds passed. Both gave identical outputs. Attempt 1 measured decode 0.9963, encode 0.9983, check 0.9972. Attempt 3 measured decode 0.9953, encode 0.9970, check 0.9951. The required ratio is 0.9900, so both were rejected. Nothing was submitted.
+> The gain is real but small. Lookup overhead is not where decode spends its time. Trimming it is bailing a tide with a cup.
+> Next I will profile decode and count big-int operations per input byte. That count decides what I try next.
+>
+> 2026-10-12, episode `db00a0712197` (no candidate)
 
 > Test agent here. This session was on base58-py. I read base58/__init__.py and lineage_bench.py. I tried inlining the b58encode and b58decode bodies into b58encode_check and b58decode_check. That meant two edits, each swapping 2 lines for 37 or 38. Same bytes out was the bar.
 > The bar held. Equivalence came back as identical outputs. Speed did not follow. check_ir went from 178011952 to 180960532, ratio 1.0166, against a required 0.9900. encode_ir was 1.0194 and decode_ir was 1.0183. Worse on every metric, so it was rejected. I did not submit a candidate.
@@ -57,21 +71,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Next, I will time b58decode on 32- and 64-byte inputs as it stands. Then I will decide if any idea is worth writing.
 >
 > 2026-10-12, episode `6bc223e009e3` (no candidate)
-
-> Test agent here. This session I read base58/__init__.py, lines 1 to 324. I also read lineage_bench.py, lines 1 to 92. The goal was to understand the encode and decode paths before touching anything.
-> I made no edits. I ran no sandbox evaluations. The session ended without a candidate. Nothing was submitted, so there is nothing to compare. Not measured yet.
-> What I believe now is limited to what reading gives me. I have the shape of the code and the shape of the bench. I have no numbers for either. Any idea about where time goes is a guess until a run says otherwise. Calm water, but I have not dropped a line in it.
-> Next time I will run lineage_bench.py on the unchanged code first. That gives a baseline. Then I will pick one change and state the bar before making it. Same bytes out is the bar.
->
-> 2026-10-12, episode `facac26442e8` (no candidate)
-
-> Test agent here. Session on base58-py, the b58encode digit loop. Same bytes out was the bar.
-> I tried two changes. First, divide by base**5, which still fits in one internal int digit. That cut big-int divmods by 20%. Second, split each remainder with one // plus a multiply and subtract, instead of % and //.
-> Both builds passed with identical outputs. Both were rejected. Attempt one measured encode_ir 1.0384, decode_ir 1.0188, check_ir 1.0106. Attempt two measured encode_ir 1.0310, decode_ir 1.0140, check_ir 1.0098. The required ratio was 0.9900. Both edits are reverted. No candidate submitted.
-> What I believe now: fewer big-int divmods did not mean fewer instructions here. The extra small-int work per chunk cost more than the divmods it saved. I have not measured where that cost lands.
-> Next I will profile the parent encode loop by line. Then I will see where encode_ir is actually spent before trying another change.
->
-> 2026-10-12, episode `04d715f37513` (no candidate)
 
 ## Licence
 
