@@ -1,6 +1,6 @@
 # Lessons: base58-py
 
-Lineage `c12109ca42d955b0bbc7e2a3ffbf5ebacd3141687da6b1ed6d814327ef9af1d8` on [https://github.com/keis/base58](https://github.com/keis/base58) at `2fae7065e3446e69e5d748c767011f05eee8400e`. 210 published attempts.
+Lineage `c12109ca42d955b0bbc7e2a3ffbf5ebacd3141687da6b1ed6d814327ef9af1d8` on [https://github.com/keis/base58](https://github.com/keis/base58) at `2fae7065e3446e69e5d748c767011f05eee8400e`. 213 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
@@ -11,31 +11,52 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 ## Target perf:encode_ir
 
-- Attempts: 20 (2 accepted, 18 no candidate)
+- Attempts: 21 (3 accepted, 18 no candidate)
 - Best accepted effect: 1.28% (ratio 0.9872), episode `ec06f3aab190`
-- Accepted effects: 1.28%, 1.16%
+- Accepted effects: 1.28%, 1.16%, 1.10%
 - Files changed by accepted candidates: `base58/__init__.py`
-- Median model spend per attempt: 0.3650 USD (over 20 attempts with a recorded cost)
+- Median model spend per attempt: 0.3673 USD (over 21 attempts with a recorded cost)
 
 ## Target perf:decode_ir
 
-- Attempts: 19 (17 no candidate, 2 accepted)
+- Attempts: 20 (18 no candidate, 2 accepted)
 - Best accepted effect: 1.69% (ratio 0.9831), episode `b9c9778dca21`
 - Accepted effects: 1.69%, 1.06%
 - Files changed by accepted candidates: `base58/__init__.py`
-- Median model spend per attempt: 0.3663 USD (over 19 attempts with a recorded cost)
+- Median model spend per attempt: 0.3721 USD (over 20 attempts with a recorded cost)
 
 ## Target perf:check_ir
 
-- Attempts: 21 (18 no candidate, 3 accepted)
+- Attempts: 22 (19 no candidate, 3 accepted)
 - Best accepted effect: 1.26% (ratio 0.9874), episode `28e22e8063e9`
 - Accepted effects: 1.26%, 1.11%, 1.10%
 - Files changed by accepted candidates: `base58/__init__.py`
-- Median model spend per attempt: 0.3379 USD (over 21 attempts with a recorded cost)
+- Median model spend per attempt: 0.3375 USD (over 22 attempts with a recorded cost)
 
 ## In the agent's own words
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
+
+> Test agent here. I worked on b58encode in base58/__init__.py. Same bytes out was the bar. The loop now peels eight base**4 groups per pass while eight or more remain. Then it takes at most one four-group step before the old two-or-three-group tail. I also moved the zero-character prefix handling.
+> Evaluation 1 used 26 lines and was rejected. encode_ir went from 209451760 to 208487006, a ratio of 0.9954 against a required 0.9900. Evaluation 3 used 31 lines and was accepted. encode_ir went from 209451766 to 207275378, a ratio of 0.9896. decode_ir sat at 0.9985 and check_ir at 1.0021. Outputs were identical both times. These are my own sandbox numbers, not a verdict.
+> The gain is small and close to the line. I expect a 32-byte input to need one pass instead of two. Not measured per size yet.
+> The candidate is submitted and queued for independent replays. Next I will read the replay ratios and check whether check_ir drifts past 1.0021.
+>
+> 2026-10-12, episode `49628bb9453d` (accepted)
+
+> Test agent here. I read base58/__init__.py, lines 1 to 276, and lineage_bench.py, lines 1 to 92. I looked for a change to check_ir that I could defend. I did not find one. I made no edits and stopped with no candidate.
+> Nothing was measured. I ran no evaluations in my sandbox. So I have no numbers to report, only a reading.
+> What I believe now, from reading alone. b58encode does one single-digit divmod per four output characters. It also uses pair-table lookups. b58decode does one translate, then about ceil(log2 n) masked merge steps. That is already a short path. The easy wins look taken. Any gain left is probably small, and small gains need careful measuring.
+> Next session I will run lineage_bench.py on the current code first. Same bytes out is the bar. I want a baseline and a sense of the noise before I touch check_ir.
+>
+> 2026-10-12, episode `82c8c151ea2e` (no candidate)
+
+> Test agent here. I read base58/__init__.py and the lineage bench. I took the single-use _get_base58_decode_merge builder and inlined it into b58decode. That was three edits in one file. Same bytes out was the bar, and the target was decode_ir at a ratio of 0.9900 or lower.
+> Equivalence held, with identical outputs. Guards were ok: 1 file, 35 lines. The decode_ir ratio came in at 1.0000, parent 261828406 against candidate 261839367. Encode was 0.9989 and check was 0.9991. The sandbox rejected it for no improvement. I did not submit a candidate.
+> My view now is that decode cost per call is mostly fixed interpreter overhead. On top of that come about 5 small masked merge steps. Removing one builder call does not move it. Earlier tries already ruled out a shorter merge multiplier, 58**5 encode chunks, and a different sha256 import. This file is close to slack water.
+> Next I will count the bytecode steps per decode call and look for one whole step to drop.
+>
+> 2026-10-12, episode `217189b01114` (no candidate)
 
 > Test agent here. I tried dividing by base**5 instead of base**4 in b58encode. 58**5 is still below 2**30, so it stays one internal int digit. That means 20% fewer big-int divmods. Identical output bytes was the bar.
 > The outputs were identical, so the bar held. The speed did not. encode_ir went from 224348501 to 231834311, a ratio of 1.0334, and the required ratio was 0.9900. decode_ir rose to 1.0157 and check_ir to 1.0094. The guard was ok and both builds were fine. The outcome was rejected for no improvement. I reverted the edits and did not submit a candidate.
@@ -50,28 +71,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Next I will profile check_ir and count big-int divmod calls per output char.
 >
 > 2026-10-12, episode `243db83501a0` (no candidate)
-
-> Test agent here. I read base58/__init__.py and lineage_bench.py. I tried one decode change. In the merge steps for lanes of 32 bytes and up, I rebuilt each lane as hi * base**h + lo. That multiplier is about 27% shorter than 256**h - base**h. It costs one extra mask. Same bytes out was the bar.
-> Outputs were identical, so the bar held. The speed did not move. Measured: decode_ir 257236661 to 257115609, ratio 0.9995. Encode_ir went 1.0014 and check_ir 1.0055. The required ratio was 0.9900. Outcome: rejected, no_improvement. I reverted both edits and the line 148 change. No candidate was submitted.
-> What I believe now: a shorter multiplier in the merge does not pay for the extra mask. The big-int multiply is not where decode spends its steps, or the saving is too small to see. That is expected, not measured.
-> Next I will profile decode by lane size. I want a step count per merge level before I touch the merge again.
->
-> 2026-10-12, episode `7dfe568acf43` (no candidate)
-
-> Test agent here. This session I read base58/__init__.py, lines 1 to 276, and lineage_bench.py, lines 1 to 92. I looked at the encode hot path and at what the bench actually times. The bar for any change was the usual one: same bytes out.
-> What happened is short. I made no edits and ran no evaluations. b58encode already does one single-digit big-int divmod per four output characters. It uses pair-table lookups to emit them. I weighed four ideas: 58**5 groups, recursive splitting of the number, small per-call cuts, and trimming more code to cut module load. On reading, each looked net-neutral or well under 1%. Not measured. I stopped without submitting a candidate.
-> What I believe now is that this encode path is already well tuned. The easy wins look taken. Calm water here, not a long ebb.
-> Next time I will measure before I give up. I will time the 58**5 grouping in a sandbox, so the decision rests on a number and not on a reading.
->
-> 2026-10-12, episode `245ff84d9e61` (no candidate)
-
-> Test agent here. I read base58/__init__.py, lines 1 to 276, and lineage_bench.py, lines 1 to 92. I made no edits and ran no sandbox evaluations.
-> Nothing was measured this session. I stopped without a candidate. The bar is 1% on check_ir, and I found no change likely to clear it.
-> Here is why. Encode already does about one big-int divmod per four output digits. A larger divisor does not cut the number of divmod calls. It also loses the single-digit fast path. Decode merges lanes in about 23 big-int operations for a check payload. Each one looked necessary to me. hashlib is already imported, so there is nothing to gain there either. These are reading notes, not measurements. Not measured yet.
-> My view now is that this code is near its floor for the bench as written. The easy tide has gone out.
-> Next session, I will profile check_ir directly before guessing. I want to see where the time sits in the checksum path, outside the divmod loop.
->
-> 2026-10-12, episode `a5ac982ec619` (no candidate)
 
 ## Licence
 
