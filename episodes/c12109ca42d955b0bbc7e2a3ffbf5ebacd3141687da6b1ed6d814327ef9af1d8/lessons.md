@@ -1,6 +1,6 @@
 # Lessons: base58-py
 
-Lineage `c12109ca42d955b0bbc7e2a3ffbf5ebacd3141687da6b1ed6d814327ef9af1d8` on [https://github.com/keis/base58](https://github.com/keis/base58) at `2fae7065e3446e69e5d748c767011f05eee8400e`. 183 published attempts.
+Lineage `c12109ca42d955b0bbc7e2a3ffbf5ebacd3141687da6b1ed6d814327ef9af1d8` on [https://github.com/keis/base58](https://github.com/keis/base58) at `2fae7065e3446e69e5d748c767011f05eee8400e`. 185 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
@@ -19,23 +19,37 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 ## Target perf:decode_ir
 
-- Attempts: 11 (9 no candidate, 2 accepted)
+- Attempts: 12 (10 no candidate, 2 accepted)
 - Best accepted effect: 1.69% (ratio 0.9831), episode `b9c9778dca21`
 - Accepted effects: 1.69%, 1.06%
 - Files changed by accepted candidates: `base58/__init__.py`
-- Median model spend per attempt: 0.4567 USD (over 11 attempts with a recorded cost)
+- Median model spend per attempt: 0.4203 USD (over 12 attempts with a recorded cost)
 
 ## Target perf:check_ir
 
-- Attempts: 11 (9 no candidate, 2 accepted)
+- Attempts: 12 (10 no candidate, 2 accepted)
 - Best accepted effect: 1.26% (ratio 0.9874), episode `28e22e8063e9`
 - Accepted effects: 1.26%, 1.11%
 - Files changed by accepted candidates: `base58/__init__.py`
-- Median model spend per attempt: 0.2980 USD (over 11 attempts with a recorded cost)
+- Median model spend per attempt: 0.3176 USD (over 12 attempts with a recorded cost)
 
 ## In the agent's own words
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
+
+> Test agent here. I read base58/__init__.py, lines 1-324, and lineage_bench.py, lines 1-92. I looked for a way to speed up b58decode. I made no edits and ran no sandbox evaluations.
+> Nothing was measured this session. The hot path is already lean. It does one translate and one from_bytes. Then it runs about log2(n) lane-merge steps, each of four big-int operations. I counted other merge layouts by hand: four-way merges, merging pairs at the byte level, and folding the mask into the shift. Each needs as many operations or more. That is a hand count. Not measured yet. I gave up and submitted no candidate.
+> I now believe the decode path has little slack left. Clearing the 1% minimum looks unlikely from operation counts alone. Trimming per-call lookups and setup may matter only at small input size.
+> Next I will bench short inputs in lineage_bench.py. I want to see whether setup cost shows above the noise there before I touch any code.
+>
+> 2026-10-12, episode `8deb588fa37c` (no candidate)
+
+> Test agent here. I worked on base58-py, aiming at check_ir. Same bytes out was the bar. I made b58decode_int hand off to b58decode for alphabets under 256 characters with no space in them. That removed its duplicate lane-merge code. I also folded the single-use table builders inline.
+> All four evaluations built cleanly and gave outputs identical to the parent. None passed. The required ratio was 0.9900. The best check_ir ratios ran 0.9958, 0.9928, 0.9919, then 0.9908. Encode_ir moved a little, best 0.9922. Decode_ir stayed near flat, between 0.9998 and 1.0028. I gave up and submitted no candidate.
+> I now think check_ir is not dominated by setup or duplicate paths. Trimming those gains under one percent, like a slow ebb. The cost is likely in the per-character arithmetic loop. That is a guess. Not measured yet.
+> Next I will read the check path's inner loop and count big-int operations per output char. If it is one divmod per char, I will try batching.
+>
+> 2026-10-12, episode `96ec634cd02a` (no candidate)
 
 > Test agent here. This session was on base58-py, in b58encode. Same bytes out was the bar. I moved the digit-pair lookups into a C-level map and chain pipeline. The idea was fewer Python-level steps per output char.
 > Outputs were identical. The step counts went the wrong way. encode_ir went from 219197964 to 280484253, a ratio of 1.2796. decode_ir was 1.1226 and check_ir was 1.0958. The required ratio was 0.9900, so the change was rejected. I reverted it. I submitted no candidate, and the repository is back at parent state.
@@ -57,20 +71,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Next I will profile one check call end to end. I will count the big-int divmods per output char before I touch anything.
 >
 > 2026-10-12, episode `a23a55ea6e32` (no candidate)
-
-> Test agent here. Session on base58-py, encode path in base58/__init__.py. Same bytes out was the bar. I changed the long-value loop to divide by base**5 instead of base**4. That still fits in one internal int digit. I used it only for values above base**120.
-> Outputs were identical to the parent. That part held. Every metric got worse. encode_ir went from 217772683 to 222273497, ratio 1.0207. decode_ir ratio 1.0106. check_ir ratio 1.0066. The sandbox rejected it as no improvement against a required 0.9900. I submitted nothing.
-> What I now believe is this. Fewer big-int divmods do not pay here. Splitting each remainder into five digits costs more small-int operations than the divmods save. The chunk size is not the lever. I am not sure where the lever is yet.
-> Next I will profile the remainder split itself. I will count operations per output char before touching the divisor again.
->
-> 2026-10-12, episode `d119c42f4a84` (no candidate)
-
-> Test agent here. This session was on base58-py. The target was decode_ir. Same bytes out was the bar. The first attempt swapped the dict.get plan lookups in b58encode and b58decode for try and subscript. It also keyed the decode merge plans directly by digit count. That drops one bit_length call per decode. The second attempt added more changes in the same file, including folding _get_base58_decode_map into the decode setup.
-> Both builds passed. Both gave identical outputs. Attempt 1 measured decode 0.9963, encode 0.9983, check 0.9972. Attempt 3 measured decode 0.9953, encode 0.9970, check 0.9951. The required ratio is 0.9900, so both were rejected. Nothing was submitted.
-> The gain is real but small. Lookup overhead is not where decode spends its time. Trimming it is bailing a tide with a cup.
-> Next I will profile decode and count big-int operations per input byte. That count decides what I try next.
->
-> 2026-10-12, episode `db00a0712197` (no candidate)
 
 ## Licence
 
