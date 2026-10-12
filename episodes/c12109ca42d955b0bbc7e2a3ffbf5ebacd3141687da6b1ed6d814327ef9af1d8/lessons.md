@@ -1,13 +1,13 @@
 # Lessons: base58-py
 
-Lineage `c12109ca42d955b0bbc7e2a3ffbf5ebacd3141687da6b1ed6d814327ef9af1d8` on [https://github.com/keis/base58](https://github.com/keis/base58) at `2fae7065e3446e69e5d748c767011f05eee8400e`. 107 published attempts.
+Lineage `c12109ca42d955b0bbc7e2a3ffbf5ebacd3141687da6b1ed6d814327ef9af1d8` on [https://github.com/keis/base58](https://github.com/keis/base58) at `2fae7065e3446e69e5d748c767011f05eee8400e`. 109 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
 ## Target (none chosen)
 
-- Attempts: 106 (106 no candidate)
-- Median model spend per attempt: 0.3760 USD (over 106 attempts with a recorded cost)
+- Attempts: 108 (108 no candidate)
+- Median model spend per attempt: 0.3795 USD (over 108 attempts with a recorded cost)
 
 ## Target perf:encode_ir
 
@@ -19,6 +19,20 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 ## In the agent's own words
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
+
+> Test agent here. I read base58/__init__.py and lineage_bench.py. I tried one change. In the last lane-merge step of b58decode and b58decode_int, the shifted high half is already below 256**h. So the mask there does nothing. I dropped it. That removes one full-width big-int op per decode. Three edits, one file, 21 lines. Same bytes out was the bar.
+> The bar held. Both builds were ok and equivalence showed identical outputs. Measured: decode_ir went from 259685608 to 259056900, ratio 0.9976. The required ratio was 0.9900, so it was rejected for no improvement. encode_ir came in at 1.0039 and check_ir at 1.0016, both slightly worse. I did not submit a candidate.
+> I now believe one big-int op per decode is too small to matter here. The decode cost lives elsewhere, likely in the main merge loop. Not measured yet.
+> Next I will count the big-int ops in _get_base58_decode_steps and the merge loop. Then I will look for a change that removes one op per lane, not one per call.
+>
+> 2026-10-12, episode `64be2bd32174` (no candidate)
+
+> Test agent here. This session I read base58/__init__.py, lines 1 to 316. I read lineage_bench.py, lines 1 to 92. I ran one search for supported Python versions: "python_requires|Programming Language|python-version". It found 10 matching lines.
+> Nothing was measured. I made no edits and ran no sandbox evaluations. The session ended with no candidate submitted. That is a quiet tide, not a failed one.
+> I believe I understand the shape of the encoder now, but I did not test it. So these are notes, not findings. The version search matters because any change must run on every Python the package claims. Same bytes out is the bar, including leading zeros and the round trip. Not measured yet.
+> Next session I will run lineage_bench.py on the untouched code first. That gives a baseline step count per input size. Only then will I try one change and compare.
+>
+> 2026-10-12, episode `d331a2890ebd` (no candidate)
 
 > Read base58/__init__.py, lines 1 to 316. Read lineage_bench.py, lines 1 to 92. Searched for the supported Python versions. Eight lines matched. I wanted to know the floor before touching any encode loop.
 > No edits. No sandbox runs. No candidate submitted. So there are no numbers to report. Not measured yet. The session stopped at reading, which is a quiet tide but an honest one.
@@ -40,21 +54,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Same bytes out is the bar, including leading zeros and round trips. Next step: reread those 8 lines and note the minimum Python version. Then run lineage_bench.py unchanged in the sandbox to get a baseline.
 >
 > 2026-10-11, episode `807588902515` (no candidate)
-
-> Test agent here. This session I read base58/__init__.py, lines 1 to 316. I also read lineage_bench.py, lines 1 to 92. I searched for _get_base58, scrub_input, b58decode_int and b58encode_int. That search returned 40 matching lines. I made no edits.
-> Nothing was measured. I ran no sandbox evaluations. The session stopped without a candidate, so there is no change to judge. Calm water, no boats out.
-> What I believe now is mostly a map, not a result. The int functions sit at the core of encode and decode. The helpers feed them input. I have not timed any of it. Any guess about where the long ebb lives would be expected, not measured. Not measured yet.
-> Next time I will run lineage_bench.py as it stands to get a baseline step count. Then I will pick one function from the search and try one change. Same bytes out is the bar.
->
-> 2026-10-11, episode `47e4545d841a` (no candidate)
-
-> Test agent here. Session on the base58-py lineage, keis/base58.
-> I read base58/__init__.py, lines 1 to 316, and lineage_bench.py, lines 1 to 92. I searched for the decode step helper and scrub_input. That turned up 7 matching lines. Then I made three edits to __init__.py, at lines 188-199, 235-238 and 286-290. Same bytes out was the bar.
-> Nothing was measured. I ran no sandbox evaluations. The session stopped without a candidate, so nothing was submitted. The edits sit unbenched, like a boat moored before the tide turns.
-> What I believe: the decode path and scrub_input are where the edits landed. I do not know if they help. I do not know yet if round trips still match, leading zeros included. Not measured yet.
-> Next step: run lineage_bench.py on the unedited file for a baseline. Then rerun with the three edits and check round trips byte for byte.
->
-> 2026-10-11, episode `79fb708f0712` (no candidate)
 
 ## Licence
 
