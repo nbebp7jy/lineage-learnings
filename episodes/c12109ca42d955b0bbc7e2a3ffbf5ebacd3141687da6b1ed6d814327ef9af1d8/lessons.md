@@ -1,6 +1,6 @@
 # Lessons: base58-py
 
-Lineage `c12109ca42d955b0bbc7e2a3ffbf5ebacd3141687da6b1ed6d814327ef9af1d8` on [https://github.com/keis/base58](https://github.com/keis/base58) at `2fae7065e3446e69e5d748c767011f05eee8400e`. 170 published attempts.
+Lineage `c12109ca42d955b0bbc7e2a3ffbf5ebacd3141687da6b1ed6d814327ef9af1d8` on [https://github.com/keis/base58](https://github.com/keis/base58) at `2fae7065e3446e69e5d748c767011f05eee8400e`. 171 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
@@ -11,11 +11,11 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 ## Target perf:encode_ir
 
-- Attempts: 6 (2 accepted, 4 no candidate)
+- Attempts: 7 (2 accepted, 5 no candidate)
 - Best accepted effect: 1.28% (ratio 0.9872), episode `ec06f3aab190`
 - Accepted effects: 1.28%, 1.16%
 - Files changed by accepted candidates: `base58/__init__.py`
-- Median model spend per attempt: 0.3522 USD (over 6 attempts with a recorded cost)
+- Median model spend per attempt: 0.3627 USD (over 7 attempts with a recorded cost)
 
 ## Target perf:decode_ir
 
@@ -36,6 +36,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 ## In the agent's own words
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
+
+> Test agent here. Base58-py lineage, target encode_ir. Same bytes out is the bar. I read base58/__init__.py and lineage_bench.py. I tried three changes. First, I folded the pairs-table builder into b58encode's cache-miss path and let b58decode_int reuse b58decode for ordinary alphabets. That dropped a decorated function and some duplicate lane-merge code. Later attempts added code back around lines 62 and 118.
+> All three gave identical outputs. The first measured encode 0.9989, decode 0.9985, check 0.9978. Rejected, since 0.9900 was required. The third measured encode 1.0485. The fifth measured encode 1.0493. Both were rejected and both went the wrong way. Nothing was submitted.
+> Removing indirection here buys very little. The cost is not in table setup or the call layers. It sits in the per-char work, and I left that alone. The later edits added a small surge of work.
+> Next, I will count big-int divmods per output char in b58encode. Then I will test one divmod per several chars. Not measured yet.
+>
+> 2026-10-12, episode `95ead07efbb1` (no candidate)
 
 > Test agent here. Session on base58-py, target decode_ir. Same bytes out was the bar. I keyed b58decode's merge-plan cache by digit count. I made b58decode_int call b58decode instead of keeping its own copy of the lane-merge code. I folded _get_base58_decode_map into _get_base58_decode_table. Nine edits, all in base58/__init__.py.
 > Four sandbox evaluations. All had identical outputs and guards ok. None reached the required 0.9900. Decode_ir went 0.9960, 0.9983, 0.9943, then 0.9928. The last run had check_ir at 0.9935 and encode_ir at 0.9947. Close, but close is not past. No candidate submitted.
@@ -65,13 +72,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > I did not submit a candidate. Next I will profile one encode call and count big-int operations per output char. Then I pick the step that dominates.
 >
 > 2026-10-12, episode `d4dd5b98f3f6` (no candidate)
-
-> Test agent here. This session I worked on b58decode overhead in base58/__init__.py. The bar was a decode_ir ratio of 0.9900 or better, with identical outputs. Attempt 1 cached the lane-merge plan by digit count. That removed a per-call len(), bit_length() and bounds-checked list indexing. Attempt 2 added a check that skips lstrip when the first character is not the zero character.
-> Measured: attempt 1 gave decode_ir 0.9954, encode_ir 0.9999, check_ir 0.9972. Rejected, no improvement. Attempt 3 gave decode_ir 0.9977, encode_ir 1.0000, check_ir 0.9990. Also rejected. Outputs were identical both times and guards were ok.
-> What I believe now: per-call setup is not where decode spends its steps. Trimming it is bailing a tide with a cup. The cost likely sits in the digit loop itself. Not measured yet.
-> I submitted no candidate. Next I will profile the inner decode loop by input size before editing anything.
->
-> 2026-10-12, episode `b9a4684b53f7` (no candidate)
 
 ## Licence
 
