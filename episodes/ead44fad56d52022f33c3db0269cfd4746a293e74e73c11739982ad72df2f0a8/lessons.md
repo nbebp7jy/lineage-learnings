@@ -1,6 +1,6 @@
 # Lessons: base58-py-heavy
 
-Lineage `ead44fad56d52022f33c3db0269cfd4746a293e74e73c11739982ad72df2f0a8` on [https://github.com/keis/base58](https://github.com/keis/base58) at `2fae7065e3446e69e5d748c767011f05eee8400e`. 4 published attempts.
+Lineage `ead44fad56d52022f33c3db0269cfd4746a293e74e73c11739982ad72df2f0a8` on [https://github.com/keis/base58](https://github.com/keis/base58) at `2fae7065e3446e69e5d748c767011f05eee8400e`. 5 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
@@ -14,10 +14,10 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 ## Target perf:encode_ir
 
-- Attempts: 1 (1 rejected)
-- Why candidates failed: apply_conflict (1)
+- Attempts: 2 (2 rejected)
+- Why candidates failed: apply_conflict (1), stale_conflict (1)
 - Files changed by rejected candidates: `base58/__init__.py`
-- Median model spend per attempt: 0.1125 USD (over 1 attempt with a recorded cost)
+- Median model spend per attempt: 0.1394 USD (over 2 attempts with a recorded cost)
 
 ## Target perf:decode_ir
 
@@ -29,6 +29,13 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 ## In the agent's own words
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
+
+> Test agent here. This session was on base58-py-heavy. I read base58/__init__.py and changed b58encode_int. The old loop split each base**5 remainder with five small divmods and five appends. Now it divides by base**4, which still fits one internal int digit. One divmod by base**2 gives two indices into a cached table of 2-char byte strings. The table is built once per alphabet with lru_cache. Chunks go in a list and are joined once. Same bytes out is the bar.
+> My sandbox run says identical outputs, guard ok, 1 file, 25 lines. encode_ir went from 3794222826 to 2095292787, ratio 0.5522. encode_long_ir ratio 0.6908, check_ir 0.7984, int_ir 0.7428. Decode stayed flat at 1.0002 and 1.0004. These are my numbers, not a verdict.
+> I think per-character small-int work was the main encode cost. Big-int divmods are fewer now too.
+> The candidate is queued for replay. Next I will read the decode path for the same per-char pattern.
+>
+> 2026-10-12, episode `ee3cbc67b75b` (rejected)
 
 > Test agent here. I read base58/__init__.py and looked at b58decode_int. It did one Python dict lookup per input char inside the loop. I replaced that with one bytes.translate call over the whole input. The table has 256 entries and is built once per (alphabet, autofix), cached with lru_cache. Bad chars map to 255. One find() locates the first and raises the same ValueError. Two edits, 38 lines in one file. Same bytes out was the bar.
 > My sandbox run, measured before replay: equivalence came back identical outputs. decode_ir went from 3471962522 to 3141589884, ratio 0.9048. decode_long_ir ratio 0.8810. int_ir 0.9202, check_ir 0.9706. Encode metrics stayed near flat, 1.0006 and 1.0007. Guards were ok. This is not a verdict. Replays decide.
