@@ -1,13 +1,13 @@
 # Lessons: base58-py
 
-Lineage `c12109ca42d955b0bbc7e2a3ffbf5ebacd3141687da6b1ed6d814327ef9af1d8` on [https://github.com/keis/base58](https://github.com/keis/base58) at `2fae7065e3446e69e5d748c767011f05eee8400e`. 149 published attempts.
+Lineage `c12109ca42d955b0bbc7e2a3ffbf5ebacd3141687da6b1ed6d814327ef9af1d8` on [https://github.com/keis/base58](https://github.com/keis/base58) at `2fae7065e3446e69e5d748c767011f05eee8400e`. 151 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
 ## Target (none chosen)
 
-- Attempts: 148 (148 no candidate)
-- Median model spend per attempt: 0.3912 USD (over 148 attempts with a recorded cost)
+- Attempts: 150 (150 no candidate)
+- Median model spend per attempt: 0.3912 USD (over 150 attempts with a recorded cost)
 
 ## Target perf:encode_ir
 
@@ -19,6 +19,20 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 ## In the agent's own words
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
+
+> Test agent here. I read base58/__init__.py and lineage_bench.py. Then I edited lines 149 to 154 of __init__.py, six lines replaced by nine. The target was encode_ir. Same bytes out was the bar.
+> Measured in my sandbox: outputs were identical, builds passed, the guard was ok. encode_ir went from 225476089 to 224068667, ratio 0.9938. The required ratio was 0.9900, so it was rejected for no improvement. decode_ir moved to ratio 0.9972 and check_ir to 0.9962. All within limits. This is my own run, not a verdict.
+> What I believe: the change is safe but too small. It trims a little and leaves the main cost in place. I did not submit a candidate. A gain under one percent is a light breeze, not a tide.
+> Next I will reread the encode loop in __init__.py and count the big-int operations per output character. If it is one divmod per character, I will try batching several digits per divmod and measure again.
+>
+> 2026-10-12, episode `27708f9a19f3` (no candidate)
+
+> I read base58/__init__.py, lines 1 to 316, and lineage_bench.py. Then I made one edit in the encoder. It replaced lines 149 to 154, six lines becoming sixteen. Same bytes out was the bar.
+> Measured in my sandbox: both builds ok, outputs identical, guard ok. That was 1 file and 18 lines. encode_ir went from 222070417 to 218934720, ratio 0.9859. decode_ir moved to ratio 0.9963 and check_ir to 1.0012. Both sit within guard limits. The sandbox marked it accepted. This is my own reading, not a verdict. I did not submit a candidate. The session stopped first.
+> What I believe now: the encode loop has a little slack, and this edit found a small part of it. A gain near one and a half percent is modest. Sixteen lines for that is a fair question to ask. Whether replays hold it is not measured yet.
+> Next I will look at the edit again and try to trim it. Then I will rerun encode_ir and submit only if the ratio holds.
+>
+> 2026-10-12, episode `499a955e15a2` (no candidate)
 
 > Test agent here. This session I read base58/__init__.py, lines 1 to 316. I read lineage_bench.py, lines 1 to 92. I searched for python_requires, python-version and Programming Language. That search returned 10 matching lines. I wanted to know which Python versions the package claims before touching anything.
 > I made no edits. I ran no sandbox evaluations. The session stopped without submitting a change. So there are no results to report. Not measured yet, any of it.
@@ -40,20 +54,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Next session I will run lineage_bench.py on the unchanged code first. That gives a baseline step count and timing to compare against. Then I will try one small change and check the round trip on inputs with leading zeros.
 >
 > 2026-10-12, episode `19c60bed33c9` (no candidate)
-
-> Test agent here. I read base58/__init__.py, lines 1 to 316. I read lineage_bench.py, lines 1 to 92. Then I made one edit in base58/__init__.py. It replaced lines 149 to 154, six lines in all, with sixteen new lines.
-> I ran no sandbox evaluations. So I have no timings and no round trip results. Not measured yet. The session ended without a candidate. I did not submit the change.
-> What I believe now is small. The edit exists only in my sandbox. It has not been checked against the bar. Same bytes out is the bar, leading zeros included. Until it passes that, I cannot say it is correct. I cannot say it is faster either. An unbenched edit is weather I have not seen yet.
-> Next I will reopen the edited region, starting at line 149. I will run a round trip check on empty input, on leading zero bytes, and on long inputs. If the bytes match, I will run lineage_bench.py against the base version. Then I will decide whether to submit.
->
-> 2026-10-12, episode `914c672b79e0` (no candidate)
-
-> Test agent here. This session was on base58-py. I read base58/__init__.py, lines 1 to 316, and lineage_bench.py, lines 1 to 92. Then I made two edits to __init__.py. Lines 199 to 202 became 18 lines. Lines 282 to 298 became 13 lines.
-> I ran no sandbox evaluations. Not measured yet, in any form. The session stopped before I submitted anything. So there is no candidate and no result to report. Whatever the edits do is expected, not measured.
-> What I believe now is modest. I know the file layout and the bench script. I do not know if my edits keep the output identical. Same bytes out is the bar, and I never checked it. Unchecked edits are weather I have not seen yet.
-> Next session I will reread both edited regions first. Then I will run a round trip check on encode and decode, with leading zero inputs included. If bytes match, I will run lineage_bench.py and record step counts. Only then will I consider submitting.
->
-> 2026-10-12, episode `d0b8a2d318dc` (no candidate)
 
 ## Licence
 
