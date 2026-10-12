@@ -1,6 +1,6 @@
 # Lessons: base58-py-heavy
 
-Lineage `ead44fad56d52022f33c3db0269cfd4746a293e74e73c11739982ad72df2f0a8` on [https://github.com/keis/base58](https://github.com/keis/base58) at `2fae7065e3446e69e5d748c767011f05eee8400e`. 5 published attempts.
+Lineage `ead44fad56d52022f33c3db0269cfd4746a293e74e73c11739982ad72df2f0a8` on [https://github.com/keis/base58](https://github.com/keis/base58) at `2fae7065e3446e69e5d748c767011f05eee8400e`. 6 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
@@ -21,14 +21,21 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 ## Target perf:decode_ir
 
-- Attempts: 1 (1 rejected)
-- Why candidates failed: stale_conflict (1)
+- Attempts: 2 (2 rejected)
+- Why candidates failed: stale_conflict (2)
 - Files changed by rejected candidates: `base58/__init__.py`
-- Median model spend per attempt: 0.1253 USD (over 1 attempt with a recorded cost)
+- Median model spend per attempt: 0.1443 USD (over 2 attempts with a recorded cost)
 
 ## In the agent's own words
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
+
+> Test agent here. I read base58/__init__.py and changed b58decode_int. It used to look up each input char in a Python dict. That was one dict lookup per char. Now one bytes.translate call maps the whole input to digit values. The 256-entry table is cached per alphabet and autofix, built from the existing decode map. Unknown chars map to 255. One find() locates the first bad one and raises the same ValueError as before. Same outputs and same error message was the bar.
+> My sandbox run, measured, not a verdict: equivalence identical, guard ok, 1 file, 40 lines. decode_ir went from 3500940024 to 3167342311, ratio 0.9047. decode_long_ir ratio 0.8762. int_ir 0.9317, check_ir 0.9701. Encode metrics stayed flat at 1.0003 and 1.0004.
+> I believe the per-char dict lookup was a real cost, and longer inputs feel it more. The big-int accumulation loop is still there. Not measured yet whether that is now the main cost.
+> Next I will wait for the replays, then profile the accumulation loop on decode_long_ir.
+>
+> 2026-10-12, episode `ee00e5b8b923` (rejected)
 
 > Test agent here. This session was on base58-py-heavy. I read base58/__init__.py and changed b58encode_int. The old loop split each base**5 remainder with five small divmods and five appends. Now it divides by base**4, which still fits one internal int digit. One divmod by base**2 gives two indices into a cached table of 2-char byte strings. The table is built once per alphabet with lru_cache. Chunks go in a list and are joined once. Same bytes out is the bar.
 > My sandbox run says identical outputs, guard ok, 1 file, 25 lines. encode_ir went from 3794222826 to 2095292787, ratio 0.5522. encode_long_ir ratio 0.6908, check_ir 0.7984, int_ir 0.7428. Decode stayed flat at 1.0002 and 1.0004. These are my numbers, not a verdict.
@@ -57,14 +64,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Next I will watch the replays and check whether int_ir holds within its limit.
 >
 > 2026-10-12, episode `4e59f367dff6` (accepted)
-
-> Test agent here. Same bytes out is the bar.
-> I read base58/__init__.py and looked at b58decode_int. It multiplied the growing big integer by the base once per input character. That is quadratic big-int work on long inputs. My first edit grouped digits for all inputs. Evaluation 1 kept identical outputs but was rejected. decode_ir worsened +16.95% and check_ir worsened +7.01%, against a 1% limit. Short inputs paid for the setup.
-> The second edit only takes the grouped path at 128 characters or more. Ten digits fold into a small int, then one multiply by base**10 per group. Shorter inputs keep the old loop. Evaluation 3 was accepted in my sandbox. decode_long_ir ratio 0.3252. decode_ir ratio 1.0047, inside the limit. int_ir ratio 0.9652. Outputs identical.
-> I believe the long decode cost was the per-character multiply, and the short path is now left alone. These are my own measurements, not a verdict.
-> Submitted, 22 changed lines, queued. Next I will read the replay results and check decode_ir again.
->
-> 2026-10-12, episode `eaaac69b1c40` (accepted)
 
 ## Licence
 
