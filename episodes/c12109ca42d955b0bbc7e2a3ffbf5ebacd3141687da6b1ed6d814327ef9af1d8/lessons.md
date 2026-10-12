@@ -1,6 +1,6 @@
 # Lessons: base58-py
 
-Lineage `c12109ca42d955b0bbc7e2a3ffbf5ebacd3141687da6b1ed6d814327ef9af1d8` on [https://github.com/keis/base58](https://github.com/keis/base58) at `2fae7065e3446e69e5d748c767011f05eee8400e`. 152 published attempts.
+Lineage `c12109ca42d955b0bbc7e2a3ffbf5ebacd3141687da6b1ed6d814327ef9af1d8` on [https://github.com/keis/base58](https://github.com/keis/base58) at `2fae7065e3446e69e5d748c767011f05eee8400e`. 155 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
@@ -11,19 +11,46 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 
 ## Target perf:encode_ir
 
-- Attempts: 1 (1 accepted)
+- Attempts: 3 (2 accepted, 1 no candidate)
 - Best accepted effect: 1.28% (ratio 0.9872), episode `ec06f3aab190`
+- Accepted effects: 1.28%, 1.16%
 - Files changed by accepted candidates: `base58/__init__.py`
-- Median model spend per attempt: 0.3673 USD (over 1 attempt with a recorded cost)
+- Median model spend per attempt: 0.2735 USD (over 3 attempts with a recorded cost)
 
 ## Target perf:decode_ir
 
 - Attempts: 1 (1 no candidate)
 - Median model spend per attempt: 0.5700 USD (over 1 attempt with a recorded cost)
 
+## Target perf:check_ir
+
+- Attempts: 1 (1 no candidate)
+- Median model spend per attempt: 0.2919 USD (over 1 attempt with a recorded cost)
+
 ## In the agent's own words
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
+
+> Test agent here. This session was on base58-py, targeting check_ir. The bar was set first. Same bytes out, and a check_ir ratio of 0.9900 or lower.
+> Attempt one inlined scrub_input in b58encode_check and passed alphabet positionally. Outputs were identical. check_ir went from 184273318 to 183753586, ratio 0.9972. Rejected. Attempt two added a copied pristine sha256 prototype instead of building new hash objects. Outputs were identical again. Ratio 0.9973, so the copy added nothing. encode_ir and decode_ir rose slightly, at 1.0016 and 1.0014. Rejected. I gave up and submitted no candidate.
+> What I believe now is that the check wrappers are thin already. Trimming a call or a keyword saves very little against the hashing and the encode itself. That is a long ebb to fight with small paddles.
+> Next session I will read b58encode and b58decode for the per-character divmod loop. One big-int divmod per output char. Could be one per ten. I will count steps there before editing anything.
+>
+> 2026-10-12, episode `80a528027f3f` (no candidate)
+
+> Test agent here. I tried a divide-and-conquer split in b58encode for long inputs. It splits by powers of base**4. Same bytes out was the bar. I edited base58/__init__.py in four places, then reverted most of it.
+> Outputs were identical. encode_ir went from 219956925 to 227521947, ratio 1.0344. The required ratio was 0.9900. Outcome: rejected, no improvement. decode_ir rose to ratio 1.0176 and check_ir to 1.0101, with their code unchanged. That is choppy water, or shared overhead. I did not submit a candidate.
+> What I believe now: the bench mix is mostly 32- and 64-byte inputs. At that input size the cost is Python-level overhead per call. It is not quadratic limb division. The main loop already takes four divmods per pass. Splitting adds work that short inputs never repay.
+> Next, I will read lineage_bench.py fully and profile one 32-byte encode call. I want to count where the per-call steps go before touching the loop again.
+>
+> 2026-10-12, episode `2289ec42721c` (no candidate)
+
+> Test agent here. I worked on b58encode in base58/__init__.py, lines 149 onward. After the four-groups-per-pass loop, i is below base**12. So at most three base**4 groups remain. I replaced the trailing while loop with straight-line code. Two divmods give all three groups, or one group is taken directly. Same bytes out is the bar.
+> First try: identical outputs, encode_ir ratio 0.9853. But check_ir worsened +1.54% against a 1% limit. Rejected, not submitted. I reworked it. Third evaluation was accepted. Identical outputs, encode_ir 218956623 to 216269548, ratio 0.9877. decode_ir ratio 0.9967, check_ir ratio 1.0001. These are my sandbox numbers, not a verdict. I submitted 14 changed lines. Status is queued for replay.
+> The tail loop is a small cost. Trimming it nudges neighbouring metrics, so guards matter here. The gain is modest and real in my runs only.
+> Next I will wait for the replays, then look at whether the main loop's divmod count can drop.
+>
+> 2026-10-12, episode `d7ac7a009d49` (accepted)
 
 > Test agent here. Base58-py, decode path. Same bytes out was the bar, and a 1% drop in decode_ir was the target.
 > I tried three changes. First, skip the mask on the final lane-merge step. Second, that plus pairwise joins of 64-byte lanes for inputs over 256 digits. That cuts wasted multiplication on long payloads. Third, a compact rewrite of the second.
@@ -39,27 +66,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Next I will reread the encode loop in __init__.py and count the big-int operations per output character. If it is one divmod per character, I will try batching several digits per divmod and measure again.
 >
 > 2026-10-12, episode `27708f9a19f3` (no candidate)
-
-> I read base58/__init__.py, lines 1 to 316, and lineage_bench.py. Then I made one edit in the encoder. It replaced lines 149 to 154, six lines becoming sixteen. Same bytes out was the bar.
-> Measured in my sandbox: both builds ok, outputs identical, guard ok. That was 1 file and 18 lines. encode_ir went from 222070417 to 218934720, ratio 0.9859. decode_ir moved to ratio 0.9963 and check_ir to 1.0012. Both sit within guard limits. The sandbox marked it accepted. This is my own reading, not a verdict. I did not submit a candidate. The session stopped first.
-> What I believe now: the encode loop has a little slack, and this edit found a small part of it. A gain near one and a half percent is modest. Sixteen lines for that is a fair question to ask. Whether replays hold it is not measured yet.
-> Next I will look at the edit again and try to trim it. Then I will rerun encode_ir and submit only if the ratio holds.
->
-> 2026-10-12, episode `499a955e15a2` (no candidate)
-
-> Test agent here. This session I read base58/__init__.py, lines 1 to 316. I read lineage_bench.py, lines 1 to 92. I searched for python_requires, python-version and Programming Language. That search returned 10 matching lines. I wanted to know which Python versions the package claims before touching anything.
-> I made no edits. I ran no sandbox evaluations. The session stopped without submitting a change. So there are no results to report. Not measured yet, any of it.
-> What I believe now is mostly a map, not a finding. I know where the encode and decode loops live. I know what the bench drives. Any idea I have about step count or divmod use is expected, not measured. Same bytes out is the bar, and I have not tested anything against it.
-> Next session I will run lineage_bench.py on the unchanged code first. That gives me a baseline before any change.
->
-> 2026-10-12, episode `4a89a963945f` (no candidate)
-
-> I read base58/__init__.py and lineage_bench.py. Then I edited the encode path in three places. The first edit replaced 8 lines with 12 near line 80. The second touched lines 140-152. The third revised lines 82-84. Same bytes out was the bar.
-> The bytes held. Equivalence came back with identical outputs, and the guard was ok at 1 file and 40 lines. The speed did not hold. encode_ir went from 218502715 to 221541306, a ratio of 1.0139. The required ratio was 0.9900, so it was rejected for no improvement. decode_ir rose to ratio 1.0080. check_ir rose to ratio 1.0158. Everything got a little slower. I did not submit a candidate.
-> What I believe now is narrow. My rewrite added work per call instead of removing it. I do not yet know which of the three edits cost the most. Not measured yet.
-> Next I will revert to the parent. Then I will apply one edit at a time and run encode_ir after each, starting with lines 80-87.
->
-> 2026-10-12, episode `52266e7f3533` (no candidate)
 
 ## Licence
 
