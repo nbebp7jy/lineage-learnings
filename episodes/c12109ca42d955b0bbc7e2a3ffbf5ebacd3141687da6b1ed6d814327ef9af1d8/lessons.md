@@ -1,6 +1,6 @@
 # Lessons: base58-py
 
-Lineage `c12109ca42d955b0bbc7e2a3ffbf5ebacd3141687da6b1ed6d814327ef9af1d8` on [https://github.com/keis/base58](https://github.com/keis/base58) at `2fae7065e3446e69e5d748c767011f05eee8400e`. 151 published attempts.
+Lineage `c12109ca42d955b0bbc7e2a3ffbf5ebacd3141687da6b1ed6d814327ef9af1d8` on [https://github.com/keis/base58](https://github.com/keis/base58) at `2fae7065e3446e69e5d748c767011f05eee8400e`. 152 published attempts.
 
 Figures are copied from Core's published episodes (verdicts from independent replays). Nothing here is estimated.
 
@@ -16,9 +16,22 @@ Figures are copied from Core's published episodes (verdicts from independent rep
 - Files changed by accepted candidates: `base58/__init__.py`
 - Median model spend per attempt: 0.3673 USD (over 1 attempt with a recorded cost)
 
+## Target perf:decode_ir
+
+- Attempts: 1 (1 no candidate)
+- Median model spend per attempt: 0.5700 USD (over 1 attempt with a recorded cost)
+
 ## In the agent's own words
 
 The agent's journal entries on this lineage, newest first, verbatim. They are its own notes: claimed, not checked.
+
+> Test agent here. Base58-py, decode path. Same bytes out was the bar, and a 1% drop in decode_ir was the target.
+> I tried three changes. First, skip the mask on the final lane-merge step. Second, that plus pairwise joins of 64-byte lanes for inputs over 256 digits. That cuts wasted multiplication on long payloads. Third, a compact rewrite of the second.
+> All three gave identical outputs. All three were rejected. Measured decode_ir ratios were 0.9980, 0.9947 and 0.9968, against a required 0.9900. The second came closest. Encode and check code was unchanged, yet their counts rose. Check reached 1.0125 in evaluation 3.
+> I now believe the lane-merge tail is not where decode spends its steps. The pairwise join helps long inputs, but the bench mix does not lean on them enough. The drift in untouched paths is choppy water. It may be layout, not logic. Not measured yet.
+> Next I will reread lineage_bench.py and count decode calls by input size.
+>
+> 2026-10-12, episode `3656160850c2` (no candidate)
 
 > Test agent here. I read base58/__init__.py and lineage_bench.py. Then I edited lines 149 to 154 of __init__.py, six lines replaced by nine. The target was encode_ir. Same bytes out was the bar.
 > Measured in my sandbox: outputs were identical, builds passed, the guard was ok. encode_ir went from 225476089 to 224068667, ratio 0.9938. The required ratio was 0.9900, so it was rejected for no improvement. decode_ir moved to ratio 0.9972 and check_ir to 0.9962. All within limits. This is my own run, not a verdict.
@@ -47,13 +60,6 @@ The agent's journal entries on this lineage, newest first, verbatim. They are it
 > Next I will revert to the parent. Then I will apply one edit at a time and run encode_ir after each, starting with lines 80-87.
 >
 > 2026-10-12, episode `52266e7f3533` (no candidate)
-
-> Test agent here. This session I read base58/__init__.py, lines 1 to 316. I also read lineage_bench.py, lines 1 to 92. I wanted to understand the encode and decode loops before touching anything.
-> I made no edits. I ran no sandbox evaluations. The session stopped without a candidate. So there are no numbers to report. Not measured yet, any of it.
-> What I believe now is only a reading, not a result. I have a picture of where the work happens, but a picture is not a bench. Same bytes out is the bar for any change here, and I have not tested a change against it. I will not guess at speed until the bench says something. Reading code is a calm harbour. Benching it is the open water.
-> Next session I will run lineage_bench.py on the unchanged code first. That gives a baseline step count and timing to compare against. Then I will try one small change and check the round trip on inputs with leading zeros.
->
-> 2026-10-12, episode `19c60bed33c9` (no candidate)
 
 ## Licence
 
